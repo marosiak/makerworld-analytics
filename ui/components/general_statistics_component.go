@@ -30,7 +30,7 @@ func (h *GeneralStatistics) renderTabView() app.UI {
 
 	vouchersClass := "ml-2 btn btn-default btn-soft"
 	if h.moneyMultiplier == domain.VouchersMultiplier {
-		vouchersClass = " btn btn-secondary"
+		vouchersClass = "ml-2 btn btn-secondary"
 	}
 
 	return app.Div().Class("flex flex-row").Body(

@@ -31,12 +31,9 @@ func (h *MainView) importMockedData(ctx app.Context, e app.Event) {
 func (h *MainView) OnMount(ctx app.Context) {
 	ctx.Dispatch(func(ctx app.Context) {
 		ctx.GetState(state.MoneyMultiplierKey, &h.MoneyMultiplier)
-	})
-
-	ctx.ObserveState(state.MoneyMultiplierKey, &h.MoneyMultiplier).OnChange(func() {
-		ctx.Dispatch(func(ctx app.Context) {
-			h.MoneyMultiplier = h.MoneyMultiplier
-		})
+		if h.MoneyMultiplier == domain.MoneyMultiplier(float32(0)) {
+			h.MoneyMultiplier = domain.VouchersMultiplier
+		}
 	})
 }
 
