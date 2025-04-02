@@ -17,6 +17,7 @@ func main() {
 	err := app.GenerateStaticWebsite(".", &app.Handler{
 		Name:        "Makerworld Analytics",
 		Description: "Extended stats for makerworld",
+		Resources:   app.GitHubPages("makerworld-analytics"),
 		Scripts:     []string{"https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"},
 		Styles:      []string{"https://cdn.jsdelivr.net/npm/daisyui@5"},
 	})
