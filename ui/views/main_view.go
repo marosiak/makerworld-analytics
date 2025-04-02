@@ -4,12 +4,14 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"makerworld-analytics/domain"
 	"makerworld-analytics/makerworld"
+	"makerworld-analytics/state"
 	"makerworld-analytics/ui/components"
 )
 
 type MainView struct {
 	app.Compo
-	statistics      *domain.Statistics
+	Statistics      *domain.Statistics
+	MoneyMultiplier domain.MoneyMultiplier
 	updateAvailable bool
 }
 
@@ -18,11 +20,24 @@ func (a *MainView) OnAppUpdate(ctx app.Context) {
 }
 
 func (h *MainView) onJsonChange(ctx app.Context, e app.Event) {
-	h.statistics = domain.NewStatistics(ctx.JSSrc().Get("value").String())
+	h.Statistics = domain.NewStatistics(ctx.JSSrc().Get("value").String())
 }
 
 func (h *MainView) importMockedData(ctx app.Context, e app.Event) {
-	h.statistics = domain.NewStatistics(makerworld.MockedRawJson)
+	h.Statistics = domain.NewStatistics(makerworld.MockedRawJson)
+}
+
+// on mount
+func (h *MainView) OnMount(ctx app.Context) {
+	ctx.Dispatch(func(ctx app.Context) {
+		ctx.GetState(state.MoneyMultiplierKey, &h.MoneyMultiplier)
+	})
+
+	ctx.ObserveState(state.MoneyMultiplierKey, &h.MoneyMultiplier).OnChange(func() {
+		ctx.Dispatch(func(ctx app.Context) {
+			h.MoneyMultiplier = h.MoneyMultiplier
+		})
+	})
 }
 
 func (h *MainView) Render() app.UI {
@@ -50,8 +65,8 @@ func (h *MainView) Render() app.UI {
 		app.Button().Text("Import Maciej Rosiak data").Class("btn btn-soft btn-primary").OnClick(h.importMockedData),
 
 		//components.NewGeneralStatistics(h.statistics),
-		app.If(h.statistics != nil, func() app.UI {
-			statsComponent := components.NewGeneralStatistics(h.statistics)
+		app.If(h.Statistics != nil, func() app.UI {
+			statsComponent := components.NewGeneralStatistics(h.Statistics, h.MoneyMultiplier)
 			return statsComponent
 		}),
 	)
