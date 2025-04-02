@@ -5,44 +5,53 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"makerworld-analytics/domain"
 	"makerworld-analytics/state"
-	"makerworld-analytics/utils"
 )
 
 type GeneralStatistics struct {
 	app.Compo
 	Statistics      *domain.Statistics
-	MoneyMultiplier *domain.MoneyMultiplier
+	MoneyMultiplier domain.MoneyMultiplier
 }
 
-func NewGeneralStatistics(stat *domain.Statistics) GeneralStatistics {
-	return GeneralStatistics{Statistics: stat, MoneyMultiplier: utils.ValueToPointer(domain.VouchersMultiplier)}
+func NewGeneralStatistics(statistics *domain.Statistics) *GeneralStatistics {
+	return &GeneralStatistics{Statistics: statistics, MoneyMultiplier: domain.VouchersMultiplier}
 }
 
 func (h *GeneralStatistics) OnMount(ctx app.Context) {
+	fmt.Printf("OnMount()\n")
+	println("OnMount, ale z innego printa")
+	ctx.GetState(state.MoneyMultiplierKey, &h.MoneyMultiplier)
 	ctx.ObserveState(state.MoneyMultiplierKey, &h.MoneyMultiplier).OnChange(func() {
-		fmt.Printf("Testowy print gdy zmienił się state")
+		fmt.Println("Testowy print gdy zmienił się state = " + fmt.Sprintf("%f", h.MoneyMultiplier))
 	})
+	//abc := ""
+	//ctx.ObserveState("greet-name", &abc).OnChange(func() {
+	//	fmt.Println("Testowy print gdy zmienił się state greet name)")
+	//})
+	//fmt.Println("changed state greet name to = ", abc)
 }
 
 func (h *GeneralStatistics) renderTabView() app.UI {
 	// TODO: Separate component in separate file
 	bankPayoutClass := "btn btn-default"
-	if *h.MoneyMultiplier == domain.BankPayoutMultiplier {
+	if h.MoneyMultiplier == domain.BankPayoutMultiplier {
 		bankPayoutClass += "btn-soft"
 	}
 
 	vouchersClass := "ml-1 btn btn-default"
-	if *h.MoneyMultiplier == domain.VouchersMultiplier {
+	if h.MoneyMultiplier == domain.VouchersMultiplier {
 		vouchersClass += "btn-soft"
 	}
 	return app.Div().Class("flex flex-row").Body(
 		app.Button().Class(bankPayoutClass).Text("Bank payout").OnClick(func(ctx app.Context, e app.Event) {
 			//h.MoneyMultiplier = utils.ValueToPointer(domain.BankPayoutMultiplier)
 			ctx.SetState(state.MoneyMultiplierKey, domain.BankPayoutMultiplier).Persist()
+			state.HandleGreet(ctx, app.Action{Value: "test"})
 		}),
 		app.Button().Class(vouchersClass).Text("Vouchers").OnClick(func(ctx app.Context, e app.Event) {
 			//h.MoneyMultiplier = utils.ValueToPointer(domain.VouchersMultiplier)
 			ctx.SetState(state.MoneyMultiplierKey, domain.VouchersMultiplier).Persist()
+			state.HandleGreet(ctx, app.Action{Value: "test"})
 		}),
 	)
 }
@@ -85,10 +94,10 @@ func (h *GeneralStatistics) Render() app.UI {
 			),
 			app.TBody().Body(
 				app.Tr().Body(
-					app.Td().Text(h.Statistics.ToEuro(*h.MoneyMultiplier, h.Statistics.TotalPoints)),
-					app.Td().Text(h.Statistics.ToEuro(*h.MoneyMultiplier, h.Statistics.PointsFromBoosts)),
-					app.Td().Text(h.Statistics.ToEuro(*h.MoneyMultiplier, h.Statistics.PointsFromDesign)),
-					app.Td().Text(h.Statistics.ToEuro(*h.MoneyMultiplier, h.Statistics.PointsOther)),
+					app.Td().Text(h.Statistics.ToEuro(h.MoneyMultiplier, h.Statistics.TotalPoints)),
+					app.Td().Text(h.Statistics.ToEuro(h.MoneyMultiplier, h.Statistics.PointsFromBoosts)),
+					app.Td().Text(h.Statistics.ToEuro(h.MoneyMultiplier, h.Statistics.PointsFromDesign)),
+					app.Td().Text(h.Statistics.ToEuro(h.MoneyMultiplier, h.Statistics.PointsOther)),
 				),
 			),
 		),

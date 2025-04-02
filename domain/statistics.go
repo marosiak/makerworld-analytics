@@ -2,7 +2,6 @@ package domain
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"makerworld-analytics/makerworld"
 )
@@ -22,8 +21,6 @@ const (
 )
 
 func (s Statistics) ToEuro(multiplier MoneyMultiplier, pointsAmount float32) float32 {
-	println("ToEuro() with multiplier = ", multiplier)
-	fmt.Printf("ToEuro() with multiplierssss = %f", multiplier)
 	return pointsAmount * float32(multiplier)
 }
 

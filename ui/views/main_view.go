@@ -26,6 +26,7 @@ func (h *MainView) importMockedData(ctx app.Context, e app.Event) {
 }
 
 func (h *MainView) Render() app.UI {
+
 	return app.Div().Class("p-24").Body(
 		app.If(h.updateAvailable, func() app.UI {
 			return app.Button().
@@ -48,9 +49,10 @@ func (h *MainView) Render() app.UI {
 			OnChange(h.onJsonChange).OnInput(h.onJsonChange),
 		app.Button().Text("Import Maciej Rosiak data").Class("btn btn-soft btn-primary").OnClick(h.importMockedData),
 
+		//components.NewGeneralStatistics(h.statistics),
 		app.If(h.statistics != nil, func() app.UI {
 			statsComponent := components.NewGeneralStatistics(h.statistics)
-			return statsComponent.Render()
+			return statsComponent
 		}),
 	)
 }
