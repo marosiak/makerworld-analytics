@@ -16,51 +16,38 @@ type GeneralStatistics struct {
 func NewGeneralStatistics(statistics *domain.Statistics, moneyMultiplier domain.MoneyMultiplier) *GeneralStatistics {
 	return &GeneralStatistics{statistics: statistics, moneyMultiplier: moneyMultiplier}
 }
-func (h *GeneralStatistics) OnNav(ctx app.Context) {
-	fmt.Printf("OnNav()\n")
-}
 
 func (h *GeneralStatistics) OnMount(ctx app.Context) {
-	fmt.Printf("OnMount()\n")
-	ctx.Dispatch(func(ctx app.Context) {
-		ctx.GetState(state.MoneyMultiplierKey, &h.moneyMultiplier)
-	})
-
-	println("GetState() multiplier = " + fmt.Sprintf("%f", h.moneyMultiplier))
-	ctx.ObserveState(state.MoneyMultiplierKey, &h.moneyMultiplier).OnChange(func() {
-		fmt.Println("Testowy print gdy zmienił się state = " + fmt.Sprintf("%f", h.moneyMultiplier))
-		ctx.Dispatch(func(ctx app.Context) {
-			h.moneyMultiplier = h.moneyMultiplier
-		})
-		//h.moneyMultiplier = h.moneyMultiplier
-	})
+	ctx.ObserveState(state.MoneyMultiplierKey, &h.moneyMultiplier)
 }
 
 func (h *GeneralStatistics) renderTabView() app.UI {
 	// TODO: Separate component in separate file
-	bankPayoutClass := "btn btn-default"
+	bankPayoutClass := "btn btn-default btn-soft"
 	if h.moneyMultiplier == domain.BankPayoutMultiplier {
-		bankPayoutClass += "btn-soft"
+		bankPayoutClass = " btn btn-secondary"
 	}
 
-	vouchersClass := "ml-1 btn btn-default"
+	vouchersClass := "ml-2 btn btn-default btn-soft"
 	if h.moneyMultiplier == domain.VouchersMultiplier {
-		vouchersClass += "btn-soft"
+		vouchersClass = " btn btn-secondary"
 	}
+
 	return app.Div().Class("flex flex-row").Body(
 		app.Button().Class(bankPayoutClass).Text("Bank payout").OnClick(func(ctx app.Context, e app.Event) {
-			//h.moneyMultiplier = utils.ValueToPointer(domain.BankPayoutMultiplier)
 			ctx.SetState(state.MoneyMultiplierKey, domain.BankPayoutMultiplier).Persist()
 		}),
 		app.Button().Class(vouchersClass).Text("Vouchers").OnClick(func(ctx app.Context, e app.Event) {
-			//h.moneyMultiplier = utils.ValueToPointer(domain.VouchersMultiplier)
 			ctx.SetState(state.MoneyMultiplierKey, domain.VouchersMultiplier).Persist()
 		}),
 	)
 }
 
-func (h *GeneralStatistics) Render() app.UI {
+func (h *GeneralStatistics) renderMoneyRow(value float32) app.HTMLTd {
+	return app.Td().Text(fmt.Sprintf("€%.0f", h.statistics.ToEuro(h.moneyMultiplier, value)))
+}
 
+func (h *GeneralStatistics) Render() app.UI {
 	if h.statistics == nil {
 		return app.H1().Text("Error, rendered general stats without valid stats")
 	}
@@ -84,7 +71,7 @@ func (h *GeneralStatistics) Render() app.UI {
 				),
 			),
 		),
-		app.H1().Class("text-2xl opacity-70 mt-8 ml-2 mb-2").Text(fmt.Sprintf("💰 Euro earned ~ debug = %f", h.moneyMultiplier)),
+		app.H1().Class("text-2xl opacity-70 mt-8 ml-2 mb-2").Text("💰 Euro earned"),
 		h.renderTabView(),
 		app.Table().Class("table").Body(
 			app.THead().Body(
@@ -97,10 +84,10 @@ func (h *GeneralStatistics) Render() app.UI {
 			),
 			app.TBody().Body(
 				app.Tr().Body(
-					app.Td().Text(h.statistics.ToEuro(h.moneyMultiplier, h.statistics.TotalPoints)),
-					app.Td().Text(h.statistics.ToEuro(h.moneyMultiplier, h.statistics.PointsFromBoosts)),
-					app.Td().Text(h.statistics.ToEuro(h.moneyMultiplier, h.statistics.PointsFromDesign)),
-					app.Td().Text(h.statistics.ToEuro(h.moneyMultiplier, h.statistics.PointsOther)),
+					h.renderMoneyRow(h.statistics.TotalPoints),
+					h.renderMoneyRow(h.statistics.PointsFromBoosts),
+					h.renderMoneyRow(h.statistics.PointsFromDesign),
+					h.renderMoneyRow(h.statistics.PointsOther),
 				),
 			),
 		),
