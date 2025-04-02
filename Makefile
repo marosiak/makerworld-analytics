@@ -4,7 +4,7 @@ build:
 
 build_static:
 	cd docs && go run .././cmd/static/
-	GOARCH=wasm GOOS=js go build -o docs/web/app.wasm cmd/server
+	GOARCH=wasm GOOS=js go build -o ./docs/web/app.wasm ./cmd/server
 
 run: output
 	./output/app_binary
