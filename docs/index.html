@@ -6,8 +6,8 @@
     <meta name="description" content="Extended stats for makerworld">
     <meta name="theme-color" content="#2d2c2c">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta property="og:url" content="https://">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta property="og:url" content="https:///makerworld-analytics">
     <meta property="og:title" content>
     <meta property="og:description" content="Extended stats for makerworld">
     <meta property="og:type" content="website">
@@ -15,11 +15,11 @@
     <title></title>
     <link rel="icon" href="https://raw.githubusercontent.com/maxence-charriere/go-app/master/docs/web/icon.svg">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/maxence-charriere/go-app/master/docs/web/icon.png">
-    <link rel="manifest" href="/docs/manifest.webmanifestifest.webmanifest">
-    <link href="/docs/app.css" type="text/css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" type="text/css" rel="stylesheet">
-    <script defer src="/docs/wasm_exec.jsuild/wasm_exec.js"></script>
-    <script defer src="/docs/app.js"></script>
+    <link rel="manifest" href="/makerworld-analytics/manifest.webmanifest">
+    <link href="/makerworld-analytics/app.css" type="text/css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5">
+    <script defer src="/makerworld-analytics/wasm_exec.js"></script>
+    <script defer src="/makerworld-analytics/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body>
@@ -27,7 +27,7 @@
       <h1 class="text-2xl font-bold mb-8">Makerworld Analytics</h1>
       <div class="flex flex-row mb-4">
         <p>Paste the  </p>
-        <a target="_blank" class="text-blue-400 pr-2 pl-2" href="https://makerworld.com/api/v1/point-service/point-bill/my?offset=0&limit=9999999999&filter=incomes">JSON from Makerworld</a>
+        <a class="text-blue-400 pr-2 pl-2" href="https://makerworld.com/api/v1/point-service/point-bill/my?offset=0&limit=9999999999&filter=incomes" target="_blank">JSON from Makerworld</a>
         <p> to get extended statistics.</p>
       </div>
       <textarea placeholder="Enter JSON from Makerworld" class="shadow appearance-none border rounded w-full h-32 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
@@ -35,7 +35,7 @@
     </div>
     <aside id="app-wasm-loader" class="goapp-app-info">
       <img id="app-wasm-loader-icon" class="goapp-logo goapp-spin" alt="wasm loader icon" src="https://raw.githubusercontent.com/maxence-charriere/go-app/master/docs/web/icon.png">
-      <p id="app-wasm-loader-label" class="goapp-label">0%</p>
+      <p class="goapp-label" id="app-wasm-loader-label">0%</p>
     </aside>
   </body>
 </html>
