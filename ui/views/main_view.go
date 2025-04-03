@@ -66,6 +66,8 @@ func (h *MainView) Render() app.UI {
 			statsComponent := components.NewGeneralStatistics(h.Statistics, h.MoneyMultiplier)
 			return statsComponent
 		}),
+
+		&components.ChartComponent{},
 	)
 }
 
