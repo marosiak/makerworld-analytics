@@ -61,9 +61,9 @@ func (h *MainView) Render() app.UI {
 			OnChange(h.onJsonChange).OnInput(h.onJsonChange),
 		app.Button().Text("Import Maciej Rosiak data").Class("btn btn-soft btn-primary").OnClick(h.importMockedData),
 
-		//components.NewGeneralStatistics(h.statistics),
+		//components.NewTable(h.statistics),
 		app.If(h.Statistics != nil, func() app.UI {
-			statsComponent := components.NewGeneralStatistics(h.Statistics, h.MoneyMultiplier)
+			statsComponent := components.NewTable(h.Statistics, h.MoneyMultiplier)
 			return statsComponent
 		}),
 

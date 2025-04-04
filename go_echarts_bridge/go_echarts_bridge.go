@@ -44,11 +44,31 @@ func ComponentFromChart(chartRenderer render.Renderer) app.UI {
 		return app.Div().Text("No body found in HTML")
 	}
 
-	var buf bytes.Buffer
-	for c := bodyNode.FirstChild; c != nil; c = c.NextSibling {
-		html.Render(&buf, c)
+	var (
+		bodyBuf   bytes.Buffer
+		scriptBuf bytes.Buffer
+		styleBuf  bytes.Buffer
+	)
+
+	var extractNodes func(*html.Node)
+	extractNodes = func(n *html.Node) {
+		switch {
+		case n.Type == html.ElementNode && n.Data == "script":
+			html.Render(&scriptBuf, n)
+		case n.Type == html.ElementNode && n.Data == "style":
+			html.Render(&styleBuf, n)
+		default:
+			if n.Type == html.ElementNode || n.Type == html.TextNode {
+				html.Render(&bodyBuf, n)
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			extractNodes(c)
+		}
 	}
-	return app.Raw(buf.String())
-	//return app.Div().ID("chart-component").Text(
-	//	buf.String())
+
+	for c := bodyNode.FirstChild; c != nil; c = c.NextSibling {
+		extractNodes(c)
+	}
+	return app.Raw(bodyBuf.String() + styleBuf.String() + scriptBuf.String())
 }
