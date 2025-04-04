@@ -52,25 +52,6 @@ func (h *TableComponent) Render() app.UI {
 		return app.H1().Text("Error, rendered general stats without valid stats")
 	}
 	return app.Div().ID("general-statistics").Body(
-		app.H1().Class("text-2xl opacity-70 mt-8 ml-2 mb-2").Text("All points"),
-		app.Table().Class("table").Body(
-			app.THead().Body(
-				app.Tr().Body(
-					app.Th().Text("Total points"),
-					app.Th().Text("Boosts"),
-					app.Th().Text("Design"),
-					app.Th().Text("Other"),
-				),
-			),
-			app.TBody().Body(
-				app.Tr().Body(
-					app.Td().Text(h.statistics.TotalPoints),
-					app.Td().Text(h.statistics.PointsFromBoosts),
-					app.Td().Text(h.statistics.PointsFromDesign),
-					app.Td().Text(h.statistics.PointsOther),
-				),
-			),
-		),
 		app.H1().Class("text-2xl opacity-70 mt-8 ml-2 mb-2").Text("💰 Euro earned"),
 		h.renderTabView(),
 		app.Table().Class("table").Body(

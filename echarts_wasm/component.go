@@ -11,10 +11,14 @@ type EChartComp struct {
 }
 
 func (c *EChartComp) Render() app.UI {
-	return app.Div().ID(c.ContainerID).Style("width", "900px").Style("height", "500px")
+	return app.Div().ID(c.ContainerID).Style("width", "70rem").Style("height", "600px")
 }
 
 func (c *EChartComp) OnMount(ctx app.Context) {
+	c.OnUpdate(ctx)
+}
+
+func (c *EChartComp) OnUpdate(ctx app.Context) {
 	if app.IsServer {
 		return
 	}

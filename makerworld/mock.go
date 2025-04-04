@@ -1,14 +1,270 @@
 package makerworld
 
 var MockedRawJson = `{
-"total": 723,
-"totalIncome": 8199,
+"total": 735,
+"totalIncome": 8363,
 "totalExpense": 7336,
 "totalRegularIncome": 1837,
 "totalRegularExpense": 1718,
-"totalExclusiveIncome": 6362.7,
+"totalExclusiveIncome": 6526.45,
 "totalExclusiveExpense": 5618,
 "hits": [
+{
+"type": "instance_reward",
+"pointChange": 3,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 3.75,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T11:10:54Z",
+"createTime": "2025-04-04T11:10:54Z",
+"syncSource": "",
+"instanceReward": {
+"designId": 727961,
+"designTitle": "IKEA Skadis Wall Mount Without Screws — Use Tape",
+"instanceId": 692871,
+"instanceTitle": "Alternative vertical mount",
+"downloadAndPrintCount": 400,
+"likeAndRateCount": 0,
+"averageRatingGe": "4",
+"donatedByUid": 0,
+"donatedByUsername": ""
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "design_reward",
+"pointChange": 37,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 37.5,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T01:53:39Z",
+"createTime": "2025-04-04T01:53:39Z",
+"syncSource": "",
+"designReward": {
+"id": 727961,
+"title": "IKEA Skadis Wall Mount Without Screws — Use Tape",
+"modelSource": 1,
+"downloadAndPrintCount": 3200,
+"likeAndRateCount": 0
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T00:09:15Z",
+"createTime": "2025-04-04T00:09:15Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 727961,
+"designTitle": "IKEA Skadis Wall Mount Without Screws — Use Tape",
+"fromUid": 2041721231,
+"fromUsername": "liaparadox",
+"fromUserHandle": "liaparadox"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T00:09:12Z",
+"createTime": "2025-04-04T00:09:12Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 727961,
+"designTitle": "IKEA Skadis Wall Mount Without Screws — Use Tape",
+"fromUid": 2041721231,
+"fromUsername": "liaparadox",
+"fromUserHandle": "liaparadox"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "instance_reward",
+"pointChange": 3,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 3.75,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-03T22:12:51Z",
+"createTime": "2025-04-03T22:12:51Z",
+"syncSource": "",
+"instanceReward": {
+"designId": 641585,
+"designTitle": "Bottle Kratky Adapter Best way to start hydroponic",
+"instanceId": 1096118,
+"instanceTitle": "Open sides - 0.2mm layer, 3 walls, 25% infill",
+"downloadAndPrintCount": 40,
+"likeAndRateCount": 0,
+"averageRatingGe": "4",
+"donatedByUid": 0,
+"donatedByUsername": ""
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "instance_reward",
+"pointChange": 10,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 10,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-03T20:14:18Z",
+"createTime": "2025-04-03T20:14:18Z",
+"syncSource": "",
+"instanceReward": {
+"designId": 727961,
+"designTitle": "IKEA Skadis Wall Mount Without Screws — Use Tape",
+"instanceId": 659460,
+"instanceTitle": "[ Recommended ] - 0.2mm layer, 2 walls, 15% infill",
+"downloadAndPrintCount": 2500,
+"likeAndRateCount": 0,
+"averageRatingGe": "4",
+"donatedByUid": 0,
+"donatedByUsername": ""
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-03T18:58:35Z",
+"createTime": "2025-04-03T18:58:35Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 945857,
+"designTitle": "Boxing Glove Drying Stand - Stylish Gear Holder",
+"fromUid": 843013104,
+"fromUsername": "tiger",
+"fromUserHandle": "tiger666"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-03T17:40:17Z",
+"createTime": "2025-04-03T17:40:17Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 727961,
+"designTitle": "IKEA Skadis Wall Mount Without Screws — Use Tape",
+"fromUid": 3719804501,
+"fromUsername": "user_3719804501",
+"fromUserHandle": "user_3719804501"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-03T11:27:24Z",
+"createTime": "2025-04-03T11:27:24Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 641585,
+"designTitle": "Bottle Kratky Adapter Best way to start hydroponic",
+"fromUid": 2697621081,
+"fromUsername": "user_2697621081",
+"fromUserHandle": "user_2697621081"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-03T00:20:04Z",
+"createTime": "2025-04-03T00:20:04Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 727961,
+"designTitle": "IKEA Skadis Wall Mount Without Screws — Use Tape",
+"fromUid": 389653908,
+"fromUsername": "Enigmatic Mind",
+"fromUserHandle": "Enigmatic_Mind"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-03T00:19:00Z",
+"createTime": "2025-04-03T00:19:00Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 641585,
+"designTitle": "Bottle Kratky Adapter Best way to start hydroponic",
+"fromUid": 1579809243,
+"fromUsername": "Parev",
+"fromUserHandle": "Parev"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "instance_reward",
+"pointChange": 3,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 3.75,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-02T23:39:18Z",
+"createTime": "2025-04-02T23:39:18Z",
+"syncSource": "",
+"instanceReward": {
+"designId": 748725,
+"designTitle": "Monopoly jail compliant counter | No AMS necessary",
+"instanceId": 682105,
+"instanceTitle": "0.4mm nozzle 0.2mm layer, 2 walls, 15% infill",
+"downloadAndPrintCount": 300,
+"likeAndRateCount": 0,
+"averageRatingGe": "4",
+"donatedByUid": 0,
+"donatedByUsername": ""
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
 {
 "type": "boost_exchange_point",
 "pointChange": 15,

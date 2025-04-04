@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"makerworld-analytics/makerworld"
+	"time"
 )
 
 type Statistics struct {
@@ -12,7 +13,7 @@ type Statistics struct {
 	PointsFromDesign float32 `json:"pointsFromDesign"`
 	PointsOther      float32 `json:"pointsOther"`
 
-	PointsPerDay map[string]float32 `json:"pointsPerDay"`
+	PointsPerDay map[time.Time]float32 `json:"pointsPerDay"`
 }
 
 type MoneyMultiplier float32
@@ -38,10 +39,10 @@ func NewStatistics(sourceJson string) *Statistics {
 	incomeFromDesignAllTime := rawStatsData.Hits.FilterByType(makerworld.RevenueSourceDesignReward).SumPointsChange()
 	incomeFromInstanceRewardAllTime := rawStatsData.Hits.FilterByType(makerworld.RevenueSourceInstanceReward).SumPointsChange()
 
-	pointsPerDay := make(map[string]float32)
+	pointsPerDay := make(map[time.Time]float32)
 	for _, hit := range rawStatsData.Hits {
 		if !hit.CreateTime.IsZero() {
-			pointsPerDay[hit.CreateTime.Format("2006-01-02")] += hit.PointChange
+			pointsPerDay[hit.CreateTime] += hit.PointChange
 		}
 	}
 

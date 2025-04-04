@@ -1,6 +1,44 @@
 package echarts_wasm
 
-import "github.com/maxence-charriere/go-app/v10/pkg/app"
+type EChartsData interface {
+	ToJS() interface{}
+}
+
+type BarData struct {
+	Values []float32
+}
+
+func (b BarData) ToJS() interface{} {
+	var arr []interface{}
+	for _, v := range b.Values {
+		arr = append(arr, map[string]interface{}{"value": v})
+	}
+	return arr
+}
+
+type NumericData struct {
+	Values []float32
+}
+
+func (n NumericData) ToJS() interface{} {
+	var arr []interface{}
+	for _, v := range n.Values {
+		arr = append(arr, v)
+	}
+	return arr
+}
+
+type StringData struct {
+	Values []string
+}
+
+func (s StringData) ToJS() interface{} {
+	var arr []interface{}
+	for _, v := range s.Values {
+		arr = append(arr, v)
+	}
+	return arr
+}
 
 type ChartOption struct {
 	Color   []string
@@ -21,12 +59,8 @@ type LegendOption struct {
 type SeriesOption struct {
 	Name  string
 	Type  string
-	Data  []DataItem
+	Data  EChartsData
 	Label map[string]interface{}
-}
-
-type DataItem struct {
-	Value interface{}
 }
 
 type TitleOption struct {
@@ -50,76 +84,6 @@ type YAxisOption struct {
 	Some map[string]interface{}
 }
 
-func (o ChartOption) ToValue() app.Value {
-	m := map[string]interface{}{}
-	if len(o.Color) > 0 {
-		m["color"] = o.Color
-	}
-	l := map[string]interface{}{}
-	if len(o.Legend.Data) > 0 {
-		l["data"] = o.Legend.Data
-	}
-	if o.Legend.Other != nil {
-		for k, v := range o.Legend.Other {
-			l[k] = v
-		}
-	}
-	m["legend"] = l
-	var seriesArr []interface{}
-	for _, s := range o.Series {
-		sm := map[string]interface{}{}
-		sm["name"] = s.Name
-		sm["type"] = s.Type
-		var dataArr []interface{}
-		for _, d := range s.Data {
-			dataArr = append(dataArr, map[string]interface{}{"value": d.Value})
-		}
-		sm["data"] = dataArr
-		if s.Label != nil {
-			sm["label"] = s.Label
-		}
-		seriesArr = append(seriesArr, sm)
-	}
-	m["series"] = seriesArr
-	t := map[string]interface{}{}
-	if o.Title.Text != "" {
-		t["text"] = o.Title.Text
-	}
-	if o.Title.More != nil {
-		for k, v := range o.Title.More {
-			t[k] = v
-		}
-	}
-	m["title"] = t
-	m["toolbox"] = map[string]interface{}{
-		"show": o.Toolbox.Show,
-	}
-	m["tooltip"] = map[string]interface{}{
-		"show": o.Tooltip.Show,
-	}
-	var xAxisArr []interface{}
-	for _, x := range o.XAxis {
-		xmap := map[string]interface{}{}
-		if len(x.Data) > 0 {
-			xmap["data"] = x.Data
-		}
-		xAxisArr = append(xAxisArr, xmap)
-	}
-	m["xAxis"] = xAxisArr
-	var yAxisArr []interface{}
-	for _, y := range o.YAxis {
-		ymap := map[string]interface{}{}
-		if y.Some != nil {
-			for k, v := range y.Some {
-				ymap[k] = v
-			}
-		}
-		yAxisArr = append(yAxisArr, ymap)
-	}
-	m["yAxis"] = yAxisArr
-	return app.ValueOf(m)
-}
-
 func (o ChartOption) ToMap() map[string]interface{} {
 	m := map[string]interface{}{
 		"color":   sliceOfStringToInterface(o.Color),
@@ -131,11 +95,9 @@ func (o ChartOption) ToMap() map[string]interface{} {
 		"xAxis":   []interface{}{},
 		"yAxis":   []interface{}{},
 	}
-
 	if len(o.Color) == 0 {
 		delete(m, "color")
 	}
-
 	leg := map[string]interface{}{}
 	if len(o.Legend.Data) > 0 {
 		leg["data"] = sliceOfStringToInterface(o.Legend.Data)
@@ -150,30 +112,27 @@ func (o ChartOption) ToMap() map[string]interface{} {
 	} else {
 		delete(m, "legend")
 	}
-
 	var seriesArr []interface{}
 	for _, s := range o.Series {
-		seriesMap := map[string]interface{}{
+		sm := map[string]interface{}{
 			"name": s.Name,
 			"type": s.Type,
-			"data": []interface{}{},
 		}
-		if len(s.Data) > 0 {
-			var d []interface{}
-			for _, dp := range s.Data {
-				d = append(d, map[string]interface{}{"value": dp.Value})
-			}
-			seriesMap["data"] = d
+		if s.Data != nil {
+			sm["data"] = s.Data.ToJS()
+		} else {
+			sm["data"] = []interface{}{}
 		}
 		if s.Label != nil {
-			seriesMap["label"] = s.Label
+			sm["label"] = s.Label
 		}
-		seriesArr = append(seriesArr, seriesMap)
+		seriesArr = append(seriesArr, sm)
 	}
 	if len(seriesArr) > 0 {
 		m["series"] = seriesArr
+	} else {
+		delete(m, "series")
 	}
-
 	titleMap := map[string]interface{}{}
 	if o.Title.Text != "" {
 		titleMap["text"] = o.Title.Text
@@ -188,19 +147,16 @@ func (o ChartOption) ToMap() map[string]interface{} {
 	} else {
 		delete(m, "title")
 	}
-
 	if o.Toolbox.Show {
 		m["toolbox"] = map[string]interface{}{"show": true}
 	} else {
 		delete(m, "toolbox")
 	}
-
 	if o.Tooltip.Show {
 		m["tooltip"] = map[string]interface{}{"show": true}
 	} else {
 		delete(m, "tooltip")
 	}
-
 	var xAxisArr []interface{}
 	for _, xa := range o.XAxis {
 		xmap := map[string]interface{}{}
@@ -214,7 +170,6 @@ func (o ChartOption) ToMap() map[string]interface{} {
 	} else {
 		delete(m, "xAxis")
 	}
-
 	var yAxisArr []interface{}
 	for _, ya := range o.YAxis {
 		ymap := map[string]interface{}{}
@@ -230,7 +185,6 @@ func (o ChartOption) ToMap() map[string]interface{} {
 	} else {
 		delete(m, "yAxis")
 	}
-
 	return m
 }
 

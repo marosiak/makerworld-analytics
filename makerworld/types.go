@@ -1,6 +1,9 @@
 package makerworld
 
-import "time"
+import (
+	"sort"
+	"time"
+)
 
 type RevenueSource string
 
@@ -52,6 +55,16 @@ type PointsStatistics struct {
 	TotalExclusiveIncome  float64  `json:"totalExclusiveIncome"`
 	TotalExclusiveExpense float32  `json:"totalExclusiveExpense"`
 	Hits                  HitsList `json:"hits"`
+}
+
+func (a HitsList) SortByDate(ascent bool) HitsList {
+	sort.Slice(a, func(i, j int) bool {
+		if ascent {
+			return a[i].PointTime.Before(a[j].PointTime)
+		}
+		return a[i].PointTime.After(a[j].PointTime)
+	})
+	return a
 }
 
 func (a HitsList) FilterByTimeRange(start time.Time, end time.Time) []Hit {
