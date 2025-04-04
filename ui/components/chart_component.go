@@ -47,38 +47,44 @@ func (h *ChartComponent) Render() app.UI {
 		time.Sleep(time.Second * 2)
 		app.Window().Get("console").Call("log", "Started go func()")
 
-		container := app.Window().Get("document").Call("getElementById", "RzqGdVyyqgiS")
+		doc := app.Window().Get("document")
+		container := doc.Call("getElementById", "RzqGdVyyqgiS") // element <div> dla wykresu
+		echarts := app.Window().Get("echarts")
 
-		goecharts := app.Window().Get("echarts").Get("init").New(container, "white", map[string]any{
-			"renderer": "canvas",
-		})
+		theChart := echarts.Call("init", container, "white",
+			map[string]interface{}{"renderer": "canvas"})
 
-		if goecharts.IsUndefined() || goecharts.IsNull() {
-			app.Window().Get("console").Call("log", "goecharts is null")
-			return
-		} else {
-			app.Window().Get("console").Call("log", "goecharts is not null")
-		}
-
-		goecharts.Call("setOption", map[string]any{
-			"color":  []string{"#5469c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"},
-			"legend": map[string]any{},
-			"series": []map[string]interface{}{
-				{
+		option := map[string]interface{}{
+			"color": []interface{}{"#5470c6", "#91cc75", "#fac858", "#ee6666",
+				"#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"},
+			"legend": map[string]interface{}{}, // pusty obiekt
+			"series": []interface{}{
+				map[string]interface{}{
 					"name": "Category A",
 					"type": "bar",
-					"data": []map[string]interface{}{
-						{"value": 5},
-						{"value": 207},
-						{"value": 259},
-						{"value": 270},
-						{"value": 175},
-						{"value": 102},
+					"data": []interface{}{ // tablica danych (każdy punkt jako obiekt)
+						map[string]interface{}{"value": 6},
+						map[string]interface{}{"value": 208},
+						map[string]interface{}{"value": 260},
+						map[string]interface{}{"value": 271},
+						map[string]interface{}{"value": 176},
+						map[string]interface{}{"value": 103},
+						map[string]interface{}{"value": 23},
 					},
-					"label": map[string]interface{}{},
+					"label": map[string]interface{}{}, // pusty obiekt label
 				},
 			},
-		})
+			"title":   map[string]interface{}{"text": "Chart"},
+			"toolbox": map[string]interface{}{},
+			"tooltip": map[string]interface{}{},
+			"xAxis": []interface{}{
+				map[string]interface{}{"data": []interface{}{"A", "B", "C", "D", "E", "F", "G"}},
+			},
+			"yAxis": []interface{}{
+				map[string]interface{}{},
+			},
+		}
+		theChart.Call("setOption", option)
 	}()
 
 	a := `
