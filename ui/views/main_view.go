@@ -67,7 +67,9 @@ func (h *MainView) Render() app.UI {
 			return statsComponent
 		}),
 
-		&components.ChartComponent{},
+		app.If(h.Statistics != nil, func() app.UI {
+			return &components.ChartComponent{Statistics: h.Statistics}
+		}),
 	)
 }
 
