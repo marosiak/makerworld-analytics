@@ -12,8 +12,8 @@ import (
 type ChartComponent struct {
 	app.Compo
 	Statistics *domain.Statistics
-	startDate  *time.Time
-	endDate    *time.Time
+	StartDate  *time.Time
+	EndDate    *time.Time
 }
 
 func roundFloat(val float32, precision uint) float32 {
@@ -23,19 +23,32 @@ func roundFloat(val float32, precision uint) float32 {
 
 func (h *ChartComponent) getTimeFormat() string {
 	formatLayout := "2006-01-02"
-	if h.startDate != nil {
-		if h.endDate == nil {
-			if time.Since(*h.startDate).Hours() < 72 {
+	if h.StartDate != nil {
+		if h.EndDate == nil {
+			if time.Since(*h.StartDate).Hours() < 72 {
 				formatLayout = "2006-01-02 15:04"
 			}
 		} else {
-			if h.endDate.Sub(*h.startDate).Hours() < 72 {
+			if h.EndDate.Sub(*h.StartDate).Hours() < 72 {
 				formatLayout = "2006-01-02 15:04"
 			}
 		}
 	}
 
 	return formatLayout
+}
+
+type componentDataPayload struct {
+	chartOption                  echarts_wasm.ChartOption
+	incomeFromScopedPeriodIncome float32
+}
+
+func (h *ChartComponent) retrieveComponentData() componentDataPayload {
+	income := h.Statistics.PointsPerDate.FilterByDate(h.StartDate, h.EndDate).SumPointsChange()
+	return componentDataPayload{
+		chartOption:                  h.euroPerDayChartOption(),
+		incomeFromScopedPeriodIncome: domain.Statistics{}.ToEuro(domain.VouchersMultiplier, income),
+	}
 }
 
 func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
@@ -50,7 +63,7 @@ func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 	formatLayout := h.getTimeFormat()
 
 	var dates []time.Time
-	for date := range h.Statistics.PointsPerDay {
+	for date := range h.Statistics.PointsPerDate {
 		dates = append(dates, date)
 	}
 
@@ -59,13 +72,13 @@ func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 	})
 
 	for _, date := range dates {
-		if h.startDate != nil && date.Before(*h.startDate) {
+		if h.StartDate != nil && date.Before(*h.StartDate) {
 			continue
 		}
-		if h.endDate != nil && date.After(*h.endDate) {
+		if h.EndDate != nil && date.After(*h.EndDate) {
 			continue
 		}
-		pointsEarned := h.Statistics.PointsPerDay[date]
+		pointsEarned := h.Statistics.PointsPerDate[date]
 		xAxisData := date.Format(formatLayout)
 
 		xAxis[0].Data = append(xAxis[0].Data, xAxisData)
@@ -105,18 +118,11 @@ func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 }
 
 func (h *ChartComponent) Render() app.UI {
-	return app.Div().Class("pt-12").Body(
-		app.Div().Body(
-			app.H1().Class("text-2xl opacity-70 mt-8 ml-2 mb-2 select-none").Text("Euro income"),
-			&TimeRangeComponent{
-				OnChange: func(start, end *time.Time) {
-					h.startDate = start
-					h.endDate = end
-				},
-			},
-		),
+	componentData := h.retrieveComponentData()
+
+	return app.Div().Class("pt-1").Body(
 		&echarts_wasm.EChartComp{
 			ContainerID: "euro-per-day-chart",
-			Option:      h.euroPerDayChartOption(),
+			Option:      componentData.chartOption,
 		})
 }

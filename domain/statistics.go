@@ -13,7 +13,46 @@ type Statistics struct {
 	PointsFromDesign float32 `json:"pointsFromDesign"`
 	PointsOther      float32 `json:"pointsOther"`
 
-	PointsPerDay map[time.Time]float32 `json:"pointsPerDay"`
+	PointsPerDate PointsPerDateMap `json:"pointsPerDay"`
+}
+
+type PointsPerDateMap map[time.Time]float32
+
+func (s PointsPerDateMap) SumPointsChange() float32 {
+	var total float32
+	for _, points := range s {
+		total += points
+	}
+	return total
+}
+
+func (s PointsPerDateMap) AveragePointsChange() float32 {
+	var total float32
+	var count int
+	for _, points := range s {
+		total += points
+		count++
+	}
+	if count == 0 {
+		return 0
+	}
+	return total / float32(count)
+}
+
+func (s PointsPerDateMap) FilterByDate(start, end *time.Time) PointsPerDateMap {
+	filtered := make(PointsPerDateMap)
+	for date, points := range s {
+		if start != nil && date.Before(*start) {
+			continue
+		}
+
+		if end != nil && date.After(*end) {
+			continue
+		}
+
+		filtered[date] = points
+	}
+	return filtered
 }
 
 type MoneyMultiplier float32
@@ -51,6 +90,6 @@ func NewStatistics(sourceJson string) *Statistics {
 		PointsFromBoosts: incomeFromBoostsAllTime,
 		PointsFromDesign: incomeFromDesignAllTime,
 		PointsOther:      incomeFromInstanceRewardAllTime,
-		PointsPerDay:     pointsPerDay,
+		PointsPerDate:    pointsPerDay,
 	}
 }

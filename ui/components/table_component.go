@@ -9,27 +9,23 @@ import (
 
 type TableComponent struct {
 	app.Compo
-	statistics      *domain.Statistics
-	moneyMultiplier domain.MoneyMultiplier
-}
-
-func NewTable(statistics *domain.Statistics, moneyMultiplier domain.MoneyMultiplier) *TableComponent {
-	return &TableComponent{statistics: statistics, moneyMultiplier: moneyMultiplier}
+	Statistics      *domain.Statistics
+	MoneyMultiplier domain.MoneyMultiplier
 }
 
 func (h *TableComponent) OnMount(ctx app.Context) {
-	ctx.ObserveState(state.MoneyMultiplierKey, &h.moneyMultiplier)
+	ctx.ObserveState(state.MoneyMultiplierKey, &h.MoneyMultiplier)
 }
 
 func (h *TableComponent) renderTabView() app.UI {
 	// TODO: Separate component in separate file
 	bankPayoutClass := "btn btn-default btn-soft"
-	if h.moneyMultiplier == domain.BankPayoutMultiplier {
+	if h.MoneyMultiplier == domain.BankPayoutMultiplier {
 		bankPayoutClass = " btn btn-secondary"
 	}
 
 	vouchersClass := "ml-2 btn btn-default btn-soft"
-	if h.moneyMultiplier == domain.VouchersMultiplier {
+	if h.MoneyMultiplier == domain.VouchersMultiplier {
 		vouchersClass = "ml-2 btn btn-secondary"
 	}
 
@@ -44,14 +40,14 @@ func (h *TableComponent) renderTabView() app.UI {
 }
 
 func (h *TableComponent) renderMoneyRow(value float32) app.HTMLTd {
-	return app.Td().Text(fmt.Sprintf("€%.0f", h.statistics.ToEuro(h.moneyMultiplier, value)))
+	return app.Td().Text(fmt.Sprintf("€%.0f", h.Statistics.ToEuro(h.MoneyMultiplier, value)))
 }
 
 func (h *TableComponent) Render() app.UI {
-	if h.statistics == nil {
+	if h.Statistics == nil {
 		return app.H1().Text("Error, rendered general stats without valid stats")
 	}
-	return app.Div().ID("general-statistics").Body(
+	return app.Div().ID("general-Statistics").Body(
 		app.H1().Class("text-2xl opacity-70 mt-8 ml-2 mb-2").Text("💰 Euro earned"),
 		h.renderTabView(),
 		app.Table().Class("table").Body(
@@ -65,10 +61,10 @@ func (h *TableComponent) Render() app.UI {
 			),
 			app.TBody().Body(
 				app.Tr().Body(
-					h.renderMoneyRow(h.statistics.TotalPoints),
-					h.renderMoneyRow(h.statistics.PointsFromBoosts),
-					h.renderMoneyRow(h.statistics.PointsFromDesign),
-					h.renderMoneyRow(h.statistics.PointsOther),
+					h.renderMoneyRow(h.Statistics.TotalPoints),
+					h.renderMoneyRow(h.Statistics.PointsFromBoosts),
+					h.renderMoneyRow(h.Statistics.PointsFromDesign),
+					h.renderMoneyRow(h.Statistics.PointsOther),
 				),
 			),
 		),

@@ -4,15 +4,14 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"makerworld-analytics/domain"
 	"makerworld-analytics/makerworld"
-	"makerworld-analytics/state"
 	"makerworld-analytics/ui/components"
 )
 
 type MainView struct {
 	app.Compo
-	Statistics      *domain.Statistics
-	MoneyMultiplier domain.MoneyMultiplier
 	updateAvailable bool
+	Statistics      *domain.Statistics
+	Settings        components.Settings
 }
 
 func (a *MainView) OnAppUpdate(ctx app.Context) {
@@ -27,18 +26,15 @@ func (h *MainView) importMockedData(ctx app.Context, e app.Event) {
 	h.Statistics = domain.NewStatistics(makerworld.MockedRawJson)
 }
 
-// on mount
 func (h *MainView) OnMount(ctx app.Context) {
 	ctx.Dispatch(func(ctx app.Context) {
-		ctx.GetState(state.MoneyMultiplierKey, &h.MoneyMultiplier)
-		if h.MoneyMultiplier == domain.MoneyMultiplier(float32(0)) {
-			h.MoneyMultiplier = domain.VouchersMultiplier
+		h.Settings = components.Settings{
+			MoneyMultiplier: domain.VouchersMultiplier,
 		}
 	})
 }
 
 func (h *MainView) Render() app.UI {
-
 	return app.Div().Class("p-24").Body(
 		app.If(h.updateAvailable, func() app.UI {
 			return app.Button().
@@ -61,19 +57,26 @@ func (h *MainView) Render() app.UI {
 			OnChange(h.onJsonChange).OnInput(h.onJsonChange),
 		app.Button().Text("Import Maciej Rosiak data").Class("btn btn-soft btn-primary").OnClick(h.importMockedData),
 
-		//components.NewTable(h.statistics),
 		app.If(h.Statistics != nil, func() app.UI {
-			statsComponent := components.NewTable(h.Statistics, h.MoneyMultiplier)
-			return statsComponent
-		}),
-
-		app.If(h.Statistics != nil, func() app.UI {
-			return &components.ChartComponent{Statistics: h.Statistics}
-		}),
-	)
+			incomeForPeriod := domain.Statistics{}.ToEuro(h.Settings.MoneyMultiplier, h.Statistics.PointsPerDate.FilterByDate(h.Settings.StartDate, h.Settings.EndDate).SumPointsChange())
+			return app.Div().Class("mt-8").Body(
+				&components.SettingsComponent{
+					Statistics: h.Statistics,
+					Settings:   h.Settings,
+					OnSettingsChange: func(settings components.Settings) {
+						h.Settings = settings
+						println(settings.String())
+					},
+				},
+				app.Div().Class("flex flex-col mb-2 mt-2 card").Body(
+					app.H1().Class("text-xl opacity-40 mt-1 ml-2 select-none").Text("Euro income"),
+					app.P().Class("text-2xl opacity-95 mt-1 mb-4 select-none text-green-600").Textf("+%.1f2€", incomeForPeriod),
+				),
+				&components.ChartComponent{Statistics: h.Statistics, StartDate: h.Settings.StartDate, EndDate: h.Settings.EndDate},
+			)
+		}))
 }
 
 func (a *MainView) onUpdateClick(ctx app.Context, e app.Event) {
-	// Reloads the page to display the modifications.
 	ctx.Reload()
 }
