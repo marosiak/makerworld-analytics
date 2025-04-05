@@ -1,14 +1,118 @@
 package makerworld
 
 var MockedRawJson = `{
-"total": 735,
-"totalIncome": 8363,
+"total": 740,
+"totalIncome": 8427,
 "totalExpense": 7336,
 "totalRegularIncome": 1837,
 "totalRegularExpense": 1718,
-"totalExclusiveIncome": 6526.45,
+"totalExclusiveIncome": 6590.2,
 "totalExclusiveExpense": 5618,
 "hits": [
+{
+"type": "design_reward",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T21:31:52Z",
+"createTime": "2025-04-04T21:31:52Z",
+"syncSource": "",
+"designReward": {
+"id": 748725,
+"title": "Monopoly jail compliant counter | No AMS necessary",
+"modelSource": 1,
+"downloadAndPrintCount": 400,
+"likeAndRateCount": 0
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "instance_reward",
+"pointChange": 3,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 3.75,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T21:31:52Z",
+"createTime": "2025-04-04T21:31:52Z",
+"syncSource": "",
+"instanceReward": {
+"designId": 748725,
+"designTitle": "Monopoly jail compliant counter | No AMS necessary",
+"instanceId": 682101,
+"instanceTitle": "0.4mm nozzle 0.2mm layer, 2 walls, 15% infill",
+"downloadAndPrintCount": 100,
+"likeAndRateCount": 0,
+"averageRatingGe": "4",
+"donatedByUid": 0,
+"donatedByUsername": ""
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T21:28:30Z",
+"createTime": "2025-04-04T21:28:30Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 641585,
+"designTitle": "Bottle Kratky Adapter Best way to start hydroponic",
+"fromUid": 1448408213,
+"fromUsername": "CisiV",
+"fromUserHandle": "CisIV"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "design_reward",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T16:39:35Z",
+"createTime": "2025-04-04T16:39:35Z",
+"syncSource": "",
+"designReward": {
+"id": 654876,
+"title": "Multi-Bottle Seed Starter for Kratky Hydroponic",
+"modelSource": 1,
+"downloadAndPrintCount": 225,
+"likeAndRateCount": 0
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
+{
+"type": "boost_exchange_point",
+"pointChange": 15,
+"pointChangeRegular": 0,
+"pointChangeExclusive": 15,
+"isExclusiveBonus": true,
+"pointTime": "2025-04-04T15:45:55Z",
+"createTime": "2025-04-04T15:45:55Z",
+"syncSource": "",
+"extInfoBoostExchangePoint": {
+"designId": 748725,
+"designTitle": "Monopoly jail compliant counter | No AMS necessary",
+"fromUid": 1441449727,
+"fromUsername": "user_1441449727",
+"fromUserHandle": "user_1441449727"
+},
+"extInfoMakerLabFirstExport": null,
+"extInfoAcademyCourseAward": null,
+"extinfoOperationCancelExchangeCash": null
+},
 {
 "type": "instance_reward",
 "pointChange": 3,

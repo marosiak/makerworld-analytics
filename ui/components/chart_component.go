@@ -11,9 +11,10 @@ import (
 
 type ChartComponent struct {
 	app.Compo
-	Statistics *domain.Statistics
-	StartDate  *time.Time
-	EndDate    *time.Time
+	Statistics      *domain.Statistics
+	StartDate       *time.Time
+	EndDate         *time.Time
+	MoneyMultiplier domain.MoneyMultiplier
 }
 
 func roundFloat(val float32, precision uint) float32 {
@@ -47,7 +48,7 @@ func (h *ChartComponent) retrieveComponentData() componentDataPayload {
 	income := h.Statistics.PointsPerDate.FilterByDate(h.StartDate, h.EndDate).SumPointsChange()
 	return componentDataPayload{
 		chartOption:                  h.euroPerDayChartOption(),
-		incomeFromScopedPeriodIncome: domain.Statistics{}.ToEuro(domain.VouchersMultiplier, income),
+		incomeFromScopedPeriodIncome: domain.Statistics{}.ToEuro(h.MoneyMultiplier, income),
 	}
 }
 
@@ -82,7 +83,7 @@ func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 		xAxisData := date.Format(formatLayout)
 
 		xAxis[0].Data = append(xAxis[0].Data, xAxisData)
-		euroIncome := domain.Statistics{}.ToEuro(domain.VouchersMultiplier, pointsEarned)
+		euroIncome := domain.Statistics{}.ToEuro(h.MoneyMultiplier, pointsEarned)
 
 		chartData.Values = append(chartData.Values, roundFloat(euroIncome, 2))
 	}

@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 // PWA
 // -----------------------------------------------------------------------------
-const cacheName = "app-" + "4f14b448681e3742efe8a2052e986d013da9f329";
+const cacheName = "app-" + "14709bbc28df30ad53e9bbbdd052b215ebedfe67";
 const resourcesToCache = ["https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js","https://cdn.jsdelivr.net/npm/daisyui@5","https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4","/makerworld-analytics/web/icon_x512.png","/makerworld-analytics/web/icon_x192.png","/makerworld-analytics/web/app.wasm","/makerworld-analytics/wasm_exec.js","/makerworld-analytics/manifest.webmanifest","/makerworld-analytics/app.js","/makerworld-analytics/app.css","/makerworld-analytics"];
 
 self.addEventListener("install", async (event) => {
   try {
-    console.log("installing app worker 4f14b448681e3742efe8a2052e986d013da9f329");
+    console.log("installing app worker 14709bbc28df30ad53e9bbbdd052b215ebedfe67");
     await installWorker();
     await self.skipWaiting();
   } catch (error) {
@@ -23,7 +23,7 @@ self.addEventListener("activate", async (event) => {
   try {
     await deletePreviousCaches(); // Await cache cleanup
     await self.clients.claim(); // Ensure the service worker takes control of the clients
-    console.log("app worker 4f14b448681e3742efe8a2052e986d013da9f329 is activated");
+    console.log("app worker 14709bbc28df30ad53e9bbbdd052b215ebedfe67 is activated");
   } catch (error) {
     console.error("error during activation:", error);
   }

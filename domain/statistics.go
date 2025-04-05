@@ -27,16 +27,50 @@ func (s PointsPerDateMap) SumPointsChange() float32 {
 }
 
 func (s PointsPerDateMap) AveragePointsChange() float32 {
-	var total float32
-	var count int
-	for _, points := range s {
-		total += points
-		count++
-	}
-	if count == 0 {
+	if len(s) == 0 {
 		return 0
 	}
-	return total / float32(count)
+
+	normalized := map[time.Time]float32{}
+	firstDay := time.Time{}
+	lastDay := time.Time{}
+
+	for date, points := range s {
+		d := date.Format("2006-01-02")
+		dateOnly, _ := time.Parse("2006-01-02", d)
+
+		normalized[dateOnly] += points
+
+		if firstDay.IsZero() || dateOnly.Before(firstDay) {
+			firstDay = dateOnly
+		}
+		if lastDay.IsZero() || dateOnly.After(lastDay) {
+			lastDay = dateOnly
+		}
+	}
+
+	days := int(lastDay.Sub(firstDay).Hours()/24) + 1
+	if days <= 1 {
+		return 0
+	}
+
+	pointsPerDay := make([]float32, days)
+	for i := 0; i < days; i++ {
+		day := firstDay.AddDate(0, 0, i)
+		pointsPerDay[i] = normalized[day]
+	}
+
+	totalChange := float32(0)
+	for i := 1; i < days; i++ {
+		change := pointsPerDay[i] - pointsPerDay[i-1]
+		if change < 0 {
+			change = -change
+		}
+		totalChange += change
+	}
+
+	averageChange := totalChange / float32(days-1)
+	return averageChange
 }
 
 func (s PointsPerDateMap) FilterByDate(start, end *time.Time) PointsPerDateMap {

@@ -4,14 +4,14 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"makerworld-analytics/domain"
 	"makerworld-analytics/makerworld"
-	"makerworld-analytics/ui/components"
+	. "makerworld-analytics/ui/components"
 )
 
 type MainView struct {
 	app.Compo
 	updateAvailable bool
 	Statistics      *domain.Statistics
-	Settings        components.Settings
+	Settings        domain.Settings
 }
 
 func (a *MainView) OnAppUpdate(ctx app.Context) {
@@ -28,7 +28,7 @@ func (h *MainView) importMockedData(ctx app.Context, e app.Event) {
 
 func (h *MainView) OnMount(ctx app.Context) {
 	ctx.Dispatch(func(ctx app.Context) {
-		h.Settings = components.Settings{
+		h.Settings = domain.Settings{
 			MoneyMultiplier: domain.VouchersMultiplier,
 		}
 	})
@@ -58,21 +58,51 @@ func (h *MainView) Render() app.UI {
 		app.Button().Text("Import Maciej Rosiak data").Class("btn btn-soft btn-primary").OnClick(h.importMockedData),
 
 		app.If(h.Statistics != nil, func() app.UI {
-			incomeForPeriod := domain.Statistics{}.ToEuro(h.Settings.MoneyMultiplier, h.Statistics.PointsPerDate.FilterByDate(h.Settings.StartDate, h.Settings.EndDate).SumPointsChange())
-			return app.Div().Class("mt-8").Body(
-				&components.SettingsComponent{
+			filteredByDate := h.Statistics.PointsPerDate.FilterByDate(h.Settings.StartDate, h.Settings.EndDate)
+
+			incomeForPeriod := domain.Statistics{}.ToEuro(h.Settings.MoneyMultiplier, filteredByDate.SumPointsChange())
+
+			var averageDaily float32
+			if len(filteredByDate) >= 15 {
+				averageDaily = domain.Statistics{}.ToEuro(h.Settings.MoneyMultiplier, filteredByDate.AveragePointsChange())
+			}
+
+			return app.Div().Class("mt-8 flex flex-col").Body(
+				&SettingsComponent{
 					Statistics: h.Statistics,
 					Settings:   h.Settings,
-					OnSettingsChange: func(settings components.Settings) {
+					OnSettingsChange: func(settings domain.Settings) {
 						h.Settings = settings
-						println(settings.String())
 					},
 				},
-				app.Div().Class("flex flex-col mb-2 mt-2 card").Body(
-					app.H1().Class("text-xl opacity-40 mt-1 ml-2 select-none").Text("Euro income"),
-					app.P().Class("text-2xl opacity-95 mt-1 mb-4 select-none text-green-600").Textf("+%.1f2€", incomeForPeriod),
+				app.Div().Class("flex flex-row mt-2").Body(
+					// TODO: implement DRY rule for these cards, could be provided from one function with 2 params
+					&CardComponent{
+						Body: []app.UI{
+							app.H1().Class("text-xl opacity-40 mt-1 ml-2 select-none").Text("Euro income"),
+							app.P().Class("text-3xl opacity-95 mt-1 select-none text-green-600").Textf("+%.1f2€", incomeForPeriod),
+						},
+						Class: "flex flex-col mb-2 mt-2 flex-none ml-2",
+					},
+					app.If(averageDaily > 0, func() app.UI {
+						return &CardComponent{
+							Body: []app.UI{
+								app.H1().Class("text-xl opacity-40 mt-1 ml-2 select-none").Text("Average daily"),
+								app.P().Class("text-3xl opacity-95 mt-1 select-none text-green-600").Textf("+%.1f2€", averageDaily),
+							},
+							Class: "flex flex-col mb-4 mt-2 flex-none ml-2",
+						}
+					}).Else(func() app.UI {
+						return &CardComponent{
+							Body: []app.UI{
+								app.H1().Class("text-xl opacity-40 mt-1 ml-0 select-none").Text("Average daily"),
+								app.P().Class("text-3xl opacity-45 mt-1 select-none text-black").Textf("-"),
+							},
+							Class: "flex flex-col mb-2 mt-2 flex-none ml-2",
+						}
+					}),
 				),
-				&components.ChartComponent{Statistics: h.Statistics, StartDate: h.Settings.StartDate, EndDate: h.Settings.EndDate},
+				&ChartComponent{Statistics: h.Statistics, StartDate: h.Settings.StartDate, EndDate: h.Settings.EndDate, MoneyMultiplier: h.Settings.MoneyMultiplier},
 			)
 		}))
 }
