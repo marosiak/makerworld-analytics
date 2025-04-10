@@ -11,7 +11,7 @@ type EChartComp struct {
 }
 
 func (c *EChartComp) Render() app.UI {
-	return app.Div().ID(c.ContainerID).Style("width", "70rem").Style("height", "600px")
+	return app.Div().ID(c.ContainerID).Style("height", "600px").Style("width", "37vw")
 }
 
 func (c *EChartComp) OnMount(ctx app.Context) {

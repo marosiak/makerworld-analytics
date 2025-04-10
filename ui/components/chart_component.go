@@ -9,12 +9,13 @@ import (
 	"time"
 )
 
-type ChartComponent struct {
+type ChartsGridComponent struct {
 	app.Compo
-	Statistics      *domain.Statistics
-	StartDate       *time.Time
-	EndDate         *time.Time
-	MoneyMultiplier domain.MoneyMultiplier
+	Statistics                        *domain.Statistics
+	StartDate                         *time.Time
+	EndDate                           *time.Time
+	MoneyMultiplier                   domain.MoneyMultiplier
+	MinimumPointsThresholdForPieChart float32
 }
 
 func roundFloat(val float32, precision uint) float32 {
@@ -22,7 +23,7 @@ func roundFloat(val float32, precision uint) float32 {
 	return float32(math.Round(float64(val)*ratio) / ratio)
 }
 
-func (h *ChartComponent) getTimeFormat() string {
+func (h *ChartsGridComponent) getTimeFormat() string {
 	formatLayout := "2006-01-02"
 	if h.StartDate != nil {
 		if h.EndDate == nil {
@@ -39,20 +40,7 @@ func (h *ChartComponent) getTimeFormat() string {
 	return formatLayout
 }
 
-type componentDataPayload struct {
-	chartOption                  echarts_wasm.ChartOption
-	incomeFromScopedPeriodIncome float32
-}
-
-func (h *ChartComponent) retrieveComponentData() componentDataPayload {
-	income := h.Statistics.PointsPerDate.FilterByDate(h.StartDate, h.EndDate).SumPointsChange()
-	return componentDataPayload{
-		chartOption:                  h.euroPerDayChartOption(),
-		incomeFromScopedPeriodIncome: domain.Statistics{}.ToEuro(h.MoneyMultiplier, income),
-	}
-}
-
-func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
+func (h *ChartsGridComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 	chartData := echarts_wasm.NumericData{
 		Values: []float32{},
 	}
@@ -88,10 +76,14 @@ func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 		chartData.Values = append(chartData.Values, roundFloat(euroIncome, 2))
 	}
 
+	chartType := "line"
+	if len(chartData.Values) > 7 {
+		chartType = "bar"
+	}
 	series := []echarts_wasm.SeriesOption{
 		{
 			Name: "Euro income",
-			Type: "line",
+			Type: chartType,
 			Data: chartData,
 		},
 	}
@@ -118,12 +110,71 @@ func (h *ChartComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 	}
 }
 
-func (h *ChartComponent) Render() app.UI {
-	componentData := h.retrieveComponentData()
+func (h *ChartsGridComponent) euroPerModel() echarts_wasm.ChartOption {
+	chartData := echarts_wasm.PieData{}
 
-	return app.Div().Class("pt-1").Body(
-		&echarts_wasm.EChartComp{
-			ContainerID: "euro-per-day-chart",
-			Option:      componentData.chartOption,
-		})
+	for designId, v := range h.Statistics.PointsPerDesign {
+		filtered := v.FilterDate(h.StartDate, h.EndDate)
+		pointsChange := filtered.SumPointsChange()
+
+		design, designExists := h.Statistics.GetDesignByID(designId)
+		if designExists {
+			if h.MinimumPointsThresholdForPieChart > pointsChange {
+				continue
+			}
+			chartData = append(chartData, echarts_wasm.PieDataItem{
+				Name:  design.Name,
+				Value: domain.Statistics{}.ToEuro(h.MoneyMultiplier, pointsChange),
+			})
+		}
+
+	}
+	series := []echarts_wasm.SeriesOption{
+		{
+			Name:     "Euro income",
+			Type:     "pie",
+			Data:     chartData,
+			PadAngle: 15,
+			ItemStyle: echarts_wasm.ItemStyle{
+				BorderRadius: 10,
+			},
+			Radius: []string{"40%", "70%"},
+		},
+	}
+	return echarts_wasm.ChartOption{
+		Color:   []string{"#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"},
+		Series:  series,
+		Toolbox: echarts_wasm.ToolboxOption{Show: false},
+		Tooltip: echarts_wasm.TooltipOption{Show: false},
+		Title: echarts_wasm.TitleOption{
+			More: map[string]interface{}{},
+		},
+	}
+}
+
+func (h *ChartsGridComponent) Render() app.UI {
+
+	return app.Div().Class("flex flex-row wrap pt-1 justify-stretch").Body(
+		&CardComponent{
+			Body: []app.UI{
+				app.H2().Class("text-xl").Text("Euro income"),
+				&echarts_wasm.EChartComp{
+					ContainerID: "euro-per-day-chart",
+					Option:      h.euroPerDayChartOption(),
+				},
+			},
+			Class: "",
+		},
+		app.Div().Class("w-4 h-1"),
+		&CardComponent{
+			Body: []app.UI{
+				app.H2().Class("text-xl").Text("Euro per model"),
+				&echarts_wasm.EChartComp{
+					ContainerID: "euro-per-model-chart",
+					Option:      h.euroPerModel(),
+				},
+			},
+			Class: "",
+		},
+	)
 }

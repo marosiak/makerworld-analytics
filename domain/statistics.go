@@ -7,15 +7,60 @@ import (
 	"time"
 )
 
+type PointAssignment struct {
+	PointChange float32   `json:"pointChange"`
+	CreateTime  time.Time `json:"createTime"`
+}
+
+type PointsAssignmentList []PointAssignment
+
+func (p PointsAssignmentList) SumPointsChange() float32 {
+	var total float32
+	for _, points := range p {
+		total += points.PointChange
+	}
+	return total
+}
+
+func (p PointsAssignmentList) FilterDate(start, end *time.Time) PointsAssignmentList {
+	filtered := make(PointsAssignmentList, 0)
+	for _, points := range p {
+		if start != nil && points.CreateTime.Before(*start) {
+			continue
+		}
+
+		if end != nil && points.CreateTime.After(*end) {
+			continue
+		}
+
+		filtered = append(filtered, points)
+	}
+	return filtered
+}
+
+type PointsPerDesign map[DesignID]PointsAssignmentList
 type Statistics struct {
 	TotalPoints      float32 `json:"totalPoints"`
 	PointsFromBoosts float32 `json:"pointsFromBoosts"`
 	PointsFromDesign float32 `json:"pointsFromDesign"`
 	PointsOther      float32 `json:"pointsOther"`
 
-	PointsPerDate PointsPerDateMap `json:"pointsPerDay"`
+	PointsPerDate   PointsPerDateMap `json:"pointsPerDay"`
+	PointsPerDesign PointsPerDesign  `json:"pointsPerModel"`
+
+	AllPublishedDesigns []PublishedDesign `json:"allPublishedDesigns"`
 }
 
+func (s Statistics) GetDesignByID(id DesignID) (PublishedDesign, bool) {
+	for _, design := range s.AllPublishedDesigns {
+		if design.ID == id {
+			return design, true
+		}
+	}
+	return PublishedDesign{}, false
+}
+
+type PointsPerModel map[string]float32
 type PointsPerDateMap map[time.Time]float32
 
 func (s PointsPerDateMap) SumPointsChange() float32 {
@@ -112,18 +157,47 @@ func NewStatistics(sourceJson string) *Statistics {
 	incomeFromDesignAllTime := rawStatsData.Hits.FilterByType(makerworld.RevenueSourceDesignReward).SumPointsChange()
 	incomeFromInstanceRewardAllTime := rawStatsData.Hits.FilterByType(makerworld.RevenueSourceInstanceReward).SumPointsChange()
 
-	pointsPerDay := make(map[time.Time]float32)
+	pointsPerDayMap := make(map[time.Time]float32)
+	pointsPerDesignMap := make(PointsPerDesign)
+	allPublishedDesigns := make(PublishedDesignsList, 0)
+
 	for _, hit := range rawStatsData.Hits {
 		if !hit.CreateTime.IsZero() {
-			pointsPerDay[hit.CreateTime] += hit.PointChange
+			pointsPerDayMap[hit.CreateTime] += hit.PointChange
+
+			pointsAssignment := PointAssignment{
+				PointChange: hit.PointChange,
+				CreateTime:  hit.CreateTime,
+			}
+
+			designId := DesignID(hit.DesignId())
+
+			_, exists := pointsPerDesignMap[designId]
+			if exists {
+				pointsPerDesignMap[designId] = append(pointsPerDesignMap[designId], pointsAssignment)
+			} else {
+				pointsPerDesignMap[designId] = PointsAssignmentList{
+					pointsAssignment,
+				}
+			}
+
+			if !allPublishedDesigns.Exists(designId) {
+				allPublishedDesigns = append(allPublishedDesigns, PublishedDesign{
+					ID:   designId,
+					Name: hit.DesignName(),
+				})
+			}
+
 		}
 	}
 
 	return &Statistics{
-		TotalPoints:      rawStatsData.TotalIncome,
-		PointsFromBoosts: incomeFromBoostsAllTime,
-		PointsFromDesign: incomeFromDesignAllTime,
-		PointsOther:      incomeFromInstanceRewardAllTime,
-		PointsPerDate:    pointsPerDay,
+		TotalPoints:         rawStatsData.TotalIncome,
+		PointsFromBoosts:    incomeFromBoostsAllTime,
+		PointsFromDesign:    incomeFromDesignAllTime,
+		PointsOther:         incomeFromInstanceRewardAllTime,
+		PointsPerDate:       pointsPerDayMap,
+		PointsPerDesign:     pointsPerDesignMap,
+		AllPublishedDesigns: allPublishedDesigns,
 	}
 }

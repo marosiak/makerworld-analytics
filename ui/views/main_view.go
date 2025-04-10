@@ -102,7 +102,7 @@ func (h *MainView) Render() app.UI {
 						}
 					}),
 				),
-				&ChartComponent{Statistics: h.Statistics, StartDate: h.Settings.StartDate, EndDate: h.Settings.EndDate, MoneyMultiplier: h.Settings.MoneyMultiplier},
+				&ChartsGridComponent{Statistics: h.Statistics, StartDate: h.Settings.StartDate, EndDate: h.Settings.EndDate, MoneyMultiplier: h.Settings.MoneyMultiplier, MinimumPointsThresholdForPieChart: 15},
 			)
 		}))
 }

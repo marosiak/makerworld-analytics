@@ -16,6 +16,20 @@ func (b BarData) ToJS() interface{} {
 	return arr
 }
 
+type PieDataItem struct {
+	Value float32
+	Name  string
+}
+type PieData []PieDataItem
+
+func (p PieData) ToJS() interface{} {
+	var arr []interface{}
+	for _, v := range p {
+		arr = append(arr, map[string]interface{}{"value": v.Value, "name": v.Name})
+	}
+	return arr
+}
+
 type NumericData struct {
 	Values []float32
 }
@@ -56,11 +70,17 @@ type LegendOption struct {
 	Other map[string]interface{}
 }
 
+type ItemStyle struct {
+	BorderRadius int
+}
 type SeriesOption struct {
-	Name  string
-	Type  string
-	Data  EChartsData
-	Label map[string]interface{}
+	Name      string
+	Type      string
+	Data      EChartsData
+	Label     map[string]interface{}
+	Radius    []string
+	PadAngle  int
+	ItemStyle ItemStyle
 }
 
 type TitleOption struct {
@@ -73,7 +93,8 @@ type ToolboxOption struct {
 }
 
 type TooltipOption struct {
-	Show bool
+	Show  bool
+	Other map[string]interface{}
 }
 
 type XAxisOption struct {
@@ -92,8 +113,6 @@ func (o ChartOption) ToMap() map[string]interface{} {
 		"title":   map[string]interface{}{},
 		"toolbox": map[string]interface{}{},
 		"tooltip": map[string]interface{}{},
-		"xAxis":   []interface{}{},
-		"yAxis":   []interface{}{},
 	}
 	if len(o.Color) == 0 {
 		delete(m, "color")
@@ -126,6 +145,17 @@ func (o ChartOption) ToMap() map[string]interface{} {
 		if s.Label != nil {
 			sm["label"] = s.Label
 		}
+		if len(s.Radius) > 0 {
+			sm["radius"] = sliceOfStringToInterface(s.Radius)
+		}
+		if s.PadAngle != 0 {
+			sm["padAngle"] = s.PadAngle
+		}
+		if s.ItemStyle.BorderRadius != 0 {
+			sm["itemStyle"] = map[string]interface{}{
+				"borderRadius": s.ItemStyle.BorderRadius,
+			}
+		}
 		seriesArr = append(seriesArr, sm)
 	}
 	if len(seriesArr) > 0 {
@@ -152,11 +182,19 @@ func (o ChartOption) ToMap() map[string]interface{} {
 	} else {
 		delete(m, "toolbox")
 	}
+
+	m["tooltip"] = map[string]interface{}{}
 	if o.Tooltip.Show {
-		m["tooltip"] = map[string]interface{}{"show": true}
-	} else {
-		delete(m, "tooltip")
+		m["tooltip"] = map[string]interface{}{
+			"show": true,
+		}
 	}
+	if o.Tooltip.Other != nil {
+		for k, v := range o.Tooltip.Other {
+			leg[k] = v
+		}
+	}
+
 	var xAxisArr []interface{}
 	for _, xa := range o.XAxis {
 		xmap := map[string]interface{}{}

@@ -14,14 +14,21 @@ const (
 )
 
 type Hit struct {
-	Type                      RevenueSource `json:"type"`
-	PointChange               float32       `json:"pointChange"`
-	PointChangeRegular        float32       `json:"pointChangeRegular"`
-	PointChangeExclusive      float32       `json:"pointChangeExclusive"`
-	IsExclusiveBonus          bool          `json:"isExclusiveBonus"`
-	PointTime                 time.Time     `json:"pointTime"`
-	CreateTime                time.Time     `json:"createTime"`
-	SyncSource                string        `json:"syncSource"`
+	Type                 RevenueSource `json:"type"`
+	PointChange          float32       `json:"pointChange"`
+	PointChangeRegular   float32       `json:"pointChangeRegular"`
+	PointChangeExclusive float32       `json:"pointChangeExclusive"`
+	IsExclusiveBonus     bool          `json:"isExclusiveBonus"`
+	PointTime            time.Time     `json:"pointTime"`
+	CreateTime           time.Time     `json:"createTime"`
+	SyncSource           string        `json:"syncSource"`
+	DesignReward         struct {
+		Id                    int    `json:"id"`
+		Title                 string `json:"title"`
+		ModelSource           int    `json:"modelSource"`
+		DownloadAndPrintCount int    `json:"downloadAndPrintCount"`
+		LikeAndRateCount      int    `json:"likeAndRateCount"`
+	} `json:"designReward"`
 	ExtInfoBoostExchangePoint struct {
 		DesignId       int    `json:"designId"`
 		DesignTitle    string `json:"designTitle"`
@@ -43,6 +50,34 @@ type Hit struct {
 		DonatedByUid          int    `json:"donatedByUid"`
 		DonatedByUsername     string `json:"donatedByUsername"`
 	} `json:"instanceReward,omitempty"`
+}
+
+func (h Hit) DesignId() int {
+	tmp := h.ExtInfoBoostExchangePoint.DesignId
+	if tmp != 0 {
+		return tmp
+	}
+
+	tmp = h.InstanceReward.DesignId
+	if tmp != 0 {
+		return tmp
+	}
+
+	return h.DesignReward.Id
+}
+
+func (h Hit) DesignName() string {
+	tmp := h.ExtInfoBoostExchangePoint.DesignTitle
+	if tmp != "" {
+		return tmp
+	}
+
+	tmp = h.InstanceReward.DesignTitle
+	if tmp != "" {
+		return tmp
+	}
+
+	return h.DesignReward.Title
 }
 
 type HitsList []Hit
