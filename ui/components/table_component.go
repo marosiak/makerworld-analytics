@@ -30,10 +30,10 @@ func (h *TableComponent) renderTabView() app.UI {
 	}
 
 	return app.Div().Class("flex flex-row").Body(
-		app.Button().Class(bankPayoutClass).Text("Bank payout").OnClick(func(ctx app.Context, e app.Event) {
+		app.Button().Class(bankPayoutClass).Text("Bank payout").OnClick(func(ctx app.Context, _ app.Event) {
 			ctx.SetState(state.MoneyMultiplierKey, domain.BankPayoutMultiplier).Persist()
 		}),
-		app.Button().Class(vouchersClass).Text("Vouchers").OnClick(func(ctx app.Context, e app.Event) {
+		app.Button().Class(vouchersClass).Text("Vouchers").OnClick(func(ctx app.Context, _ app.Event) {
 			ctx.SetState(state.MoneyMultiplierKey, domain.VouchersMultiplier).Persist()
 		}),
 	)

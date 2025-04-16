@@ -17,7 +17,7 @@ func (b *ButtonSwitch) Render() app.UI {
 		class = " btn btn-secondary"
 	}
 
-	return app.Button().Class(class).Text(b.Text).OnClick(func(ctx app.Context, e app.Event) {
+	return app.Button().Class(class).Text(b.Text).OnClick(func(ctx app.Context, _ app.Event) {
 		if b.OnChecked != nil {
 			b.OnChecked(ctx, b.Checked)
 		}
@@ -42,7 +42,7 @@ func (b *ButtonSwitchGroup) Render() app.UI {
 				&ButtonSwitch{
 					Checked: b.Buttons[i].Checked,
 					Text:    b.Buttons[i].Text,
-					OnChecked: func(ctx app.Context, checked bool) {
+					OnChecked: func(ctx app.Context, _ bool) {
 						ctx.Update()
 						if b.OnChange != nil {
 							b.OnChange(i)

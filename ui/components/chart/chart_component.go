@@ -3,7 +3,7 @@ package chart
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"makerworld-analytics/domain"
-	"makerworld-analytics/echarts_wasm"
+	"makerworld-analytics/echarts"
 	"makerworld-analytics/ui/components"
 	"math"
 	"time"
@@ -47,17 +47,40 @@ func (h *ChartsGridComponent) Render() app.UI {
 	return app.Div().Class("flex flex-col w-full").Body(
 		app.If(h.SelectedDesign != nil, func() app.UI {
 			accumulatedEuroPerModel := h.accumulatedEuroPerModelStackedChart([]domain.DesignID{h.SelectedDesign.ID})
-			return app.If(len(accumulatedEuroPerModel.XAxis[0].Data) >= 7, func() app.UI {
-				return &components.CardComponent{
-					Body: []app.UI{
-						app.H2().Class("text-xl").Text("Accumulated euro per model"),
-						&echarts_wasm.EChartComp{
-							ContainerID:   "euro-per-model-stacked-accumulatedEuroPerModel",
-							Option:        accumulatedEuroPerModel,
-							WidthCssValue: "77vw",
-						},
-					},
-					Class: "",
+			amountOfDataPoints := len(accumulatedEuroPerModel.XAxis[0].Data)
+
+			validPeriodForAverage := domain.PeriodNone
+			if amountOfDataPoints >= 7*3 {
+				// at least 3 weeks of data
+				validPeriodForAverage = domain.PeriodWeek
+			}
+			if amountOfDataPoints >= 31*3 {
+				// at least 3 months of data
+				validPeriodForAverage = domain.PeriodMonth
+			}
+
+			return app.IfSlice(amountOfDataPoints >= 7, func() []app.UI {
+				title := "Average daily euro calculated from week"
+				if validPeriodForAverage == domain.PeriodMonth {
+					title = "Average daily euro calculated from month"
+				}
+				return []app.UI{
+					buildChartCard(
+						"Accumulated Euro per Model",
+						"euro-per-model-stacked-accumulatedEuroPerModel",
+						accumulatedEuroPerModel,
+						"89vw",
+					),
+					app.Div().Class("w-1 h-4"),
+					app.If(validPeriodForAverage != domain.PeriodNone, func() app.UI {
+						averageEuroPerModel := h.averageEuroPerModelStackedChart([]domain.DesignID{h.SelectedDesign.ID}, validPeriodForAverage)
+						return buildChartCard(
+							title,
+							"average-euro-per-model-chart",
+							averageEuroPerModel,
+							"89vw",
+						)
+					}),
 				}
 			}).Else(
 				func() app.UI {
@@ -67,30 +90,34 @@ func (h *ChartsGridComponent) Render() app.UI {
 				})
 		}).Else(func() app.UI {
 			return app.Div().Class("flex flex-row wrap w-full pt-1 justify-stretch").Body(
-				&components.CardComponent{
-					Body: []app.UI{
-						app.H2().Class("text-xl").Text("Euro income"),
-						&echarts_wasm.EChartComp{
-							ContainerID:   "euro-per-day-accumulatedEuroPerModel",
-							Option:        h.euroPerDayChartOption(),
-							WidthCssValue: "37vw",
-						},
-					},
-					Class: "",
-				},
+				buildChartCard(
+					"Euro income",
+					"euro-per-day-accumulatedEuroPerModel",
+					h.euroPerDayChartOption(),
+					"38vw",
+				),
 				app.Div().Class("w-4 h-1"),
-				&components.CardComponent{
-					Body: []app.UI{
-						app.H2().Class("text-xl").Text("Euro per model"),
-						&echarts_wasm.EChartComp{
-							ContainerID:   "euro-per-model-pie-accumulatedEuroPerModel",
-							Option:        h.euroPerModelPieChart(),
-							WidthCssValue: "37vw",
-						},
-					},
-					Class: "",
-				},
+				buildChartCard(
+					"Euro per model",
+					"euro-per-model-pie-accumulatedEuroPerModel",
+					h.euroPerModelPieChart(),
+					"38vw",
+				),
 			)
 		}),
 	)
+}
+
+func buildChartCard(title, containerID string, option echarts.ChartOption, widthCSSValue string) *components.CardComponent {
+	return &components.CardComponent{
+		Body: []app.UI{
+			app.H2().Class("text-xl").Text(title),
+			&echarts.EChartComp{
+				ContainerID:   containerID,
+				Option:        option,
+				WidthCSSValue: widthCSSValue,
+			},
+		},
+		Class: "",
+	}
 }

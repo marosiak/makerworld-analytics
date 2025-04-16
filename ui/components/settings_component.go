@@ -61,7 +61,7 @@ func (h *SettingsComponent) buildPublicationFilter() app.UI {
 	return &SelectComponent[string]{
 		OptionDataList: optionDataList,
 		CurrentValue:   currentValue,
-		OnChange: func(ctx app.Context, selected any) {
+		OnChange: func(_ app.Context, selected any) {
 			if selected != nil {
 				selectedDesignID := selected.(string)
 				for _, design := range h.Statistics.AllPublishedDesigns {

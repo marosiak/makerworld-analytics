@@ -59,7 +59,7 @@ func (s *SelectComponent[T]) Render() app.UI {
 }
 
 func (s *SelectComponent[T]) onChange() func(ctx app.Context, e app.Event) {
-	return func(ctx app.Context, e app.Event) {
+	return func(ctx app.Context, _ app.Event) {
 		if s.OnChange == nil {
 			return
 		}

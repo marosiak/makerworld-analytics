@@ -3,13 +3,13 @@ package chart
 import (
 	"fmt"
 	"makerworld-analytics/domain"
-	"makerworld-analytics/echarts_wasm"
+	"makerworld-analytics/echarts"
 	"slices"
 	"time"
 )
 
-func (h *ChartsGridComponent) accumulatedEuroPerModelStackedChart(designIDsWhitelist []domain.DesignID) echarts_wasm.ChartOption {
-	var series []echarts_wasm.SeriesOption
+func (h *ChartsGridComponent) accumulatedEuroPerModelStackedChart(designIDsWhitelist []domain.DesignID) echarts.ChartOption {
+	var series []echarts.SeriesOption
 	var xAxisDates []string
 	var legendNames []string
 
@@ -18,7 +18,8 @@ func (h *ChartsGridComponent) accumulatedEuroPerModelStackedChart(designIDsWhite
 		endDate = *h.EndDate
 	}
 
-	startDate := time.Now().Add(-24 * time.Hour * 31)
+	startDate := h.getFirstOccurredPointDate(designIDsWhitelist)
+
 	if h.StartDate != nil {
 		startDate = *h.StartDate
 	}
@@ -30,21 +31,21 @@ func (h *ChartsGridComponent) accumulatedEuroPerModelStackedChart(designIDsWhite
 		}
 	}
 
-	for designId, listOfPointsAssignments := range h.Statistics.PointsPerDesign {
-		if !slices.Contains(designIDsWhitelist, designId) {
+	for designID, listOfPointsAssignments := range h.Statistics.PointsPerDesign {
+		if !slices.Contains(designIDsWhitelist, designID) {
 			continue
 		}
 
 		filtered := listOfPointsAssignments.FilterDate(&startDate, &endDate)
 		filtered = filtered.SortByDate(true)
-		design, designExists := h.Statistics.GetDesignByID(designId)
+		design, designExists := h.Statistics.GetDesignByID(designID)
 
 		if !designExists {
-			fmt.Printf("Design with ID %d not found\n", designId)
+			fmt.Printf("Design with ID %d not found\n", designID)
 			continue
 		}
 
-		chartData := echarts_wasm.NumericData{}
+		chartData := echarts.NumericData{}
 		lastProcessedDate := ""
 		for _, xAxisValue := range xAxisDates {
 
@@ -91,29 +92,29 @@ func (h *ChartsGridComponent) accumulatedEuroPerModelStackedChart(designIDsWhite
 			chartData.Values[i] = f
 		}
 
-		series = append(series, echarts_wasm.SeriesOption{
+		series = append(series, echarts.SeriesOption{
 			Name:      design.Name,
 			Type:      "line",
 			Data:      chartData,
-			Stack:     echarts_wasm.StackTypeTotal,
+			Stack:     echarts.StackTypeTotal,
 			AreaStyle: map[string]interface{}{},
-			Emphasis:  &echarts_wasm.Emphasis{Focus: "series"},
+			Emphasis:  &echarts.Emphasis{Focus: "series"},
 		})
 	}
 
-	return echarts_wasm.ChartOption{
+	return echarts.ChartOption{
 		Color:   []string{"#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"},
 		Series:  series,
-		Toolbox: echarts_wasm.ToolboxOption{Show: false},
-		Tooltip: echarts_wasm.TooltipOption{
+		Toolbox: echarts.ToolboxOption{Show: false},
+		Tooltip: echarts.TooltipOption{
 			Other: map[string]interface{}{
 				"trigger": "axis",
 			},
 		},
-		Legend: echarts_wasm.LegendOption{
+		Legend: echarts.LegendOption{
 			Data: legendNames,
 		},
-		XAxis: []echarts_wasm.XAxisOption{
+		XAxis: []echarts.XAxisOption{
 			{
 				Data: xAxisDates,
 				Other: map[string]interface{}{
@@ -122,17 +123,17 @@ func (h *ChartsGridComponent) accumulatedEuroPerModelStackedChart(designIDsWhite
 				},
 			},
 		},
-		YAxis: []echarts_wasm.YAxisOption{
+		YAxis: []echarts.YAxisOption{
 			{
 				Some: map[string]interface{}{
 					"type": "value",
 				},
 			},
 		},
-		Title: echarts_wasm.TitleOption{
+		Title: echarts.TitleOption{
 			More: map[string]interface{}{},
 		},
-		DataZoom: []echarts_wasm.DataZoom{
+		DataZoom: []echarts.DataZoom{
 			{
 				Type:  "inside",
 				Start: 0,

@@ -10,7 +10,7 @@ type TimeRangeComponent struct {
 	OnChange func(start, end *time.Time)
 }
 
-func (c *TimeRangeComponent) inputChanged(ctx app.Context, e app.Event) {
+func (c *TimeRangeComponent) inputChanged(ctx app.Context, _ app.Event) {
 	value := ctx.JSSrc().Get("value").String()
 
 	var start, end *time.Time
@@ -54,7 +54,7 @@ func (c *TimeRangeComponent) Render() app.UI {
 	)
 }
 
-func (c *TimeRangeComponent) OnMount(ctx app.Context) {
+func (c *TimeRangeComponent) OnMount(_ app.Context) {
 	t := time.Now().Add(-1 * time.Hour * 24)
 	c.OnChange(nil, &t)
 }

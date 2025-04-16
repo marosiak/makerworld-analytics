@@ -11,6 +11,7 @@ const (
 	RevenueSourceBoost          = "boost_exchange_point"
 	RevenueSourceInstanceReward = "instance_reward"
 	RevenueSourceDesignReward   = "design_reward"
+	RevenueSourceCreateInstance = "create_instance"
 )
 
 type Hit struct {
@@ -23,16 +24,16 @@ type Hit struct {
 	CreateTime           time.Time     `json:"createTime"`
 	SyncSource           string        `json:"syncSource"`
 	DesignReward         struct {
-		Id                    int    `json:"id"`
+		ID                    int    `json:"id"`
 		Title                 string `json:"title"`
 		ModelSource           int    `json:"modelSource"`
 		DownloadAndPrintCount int    `json:"downloadAndPrintCount"`
 		LikeAndRateCount      int    `json:"likeAndRateCount"`
 	} `json:"designReward"`
 	ExtInfoBoostExchangePoint struct {
-		DesignId       int    `json:"designId"`
+		DesignID       int    `json:"designId"`
 		DesignTitle    string `json:"designTitle"`
-		FromUid        int64  `json:"fromUid"`
+		FromUID        int64  `json:"fromUid"`
 		FromUsername   string `json:"fromUsername"`
 		FromUserHandle string `json:"fromUserHandle"`
 	} `json:"extInfoBoostExchangePoint,omitempty"`
@@ -40,30 +41,54 @@ type Hit struct {
 	ExtInfoAcademyCourseAward          interface{} `json:"extInfoAcademyCourseAward"`
 	ExtinfoOperationCancelExchangeCash interface{} `json:"extinfoOperationCancelExchangeCash"`
 	InstanceReward                     struct {
-		DesignId              int    `json:"designId"`
+		DesignID              int    `json:"designId"`
 		DesignTitle           string `json:"designTitle"`
-		InstanceId            int    `json:"instanceId"`
+		InstanceID            int    `json:"instanceId"`
 		InstanceTitle         string `json:"instanceTitle"`
 		DownloadAndPrintCount int    `json:"downloadAndPrintCount"`
 		LikeAndRateCount      int    `json:"likeAndRateCount"`
 		AverageRatingGe       string `json:"averageRatingGe"`
-		DonatedByUid          int    `json:"donatedByUid"`
+		DonatedByUID          int    `json:"donatedByUid"`
 		DonatedByUsername     string `json:"donatedByUsername"`
 	} `json:"instanceReward,omitempty"`
+
+	Instance struct {
+		DesignId          int    `json:"designId"`
+		DesignTitle       string `json:"designTitle"`
+		InstanceId        int    `json:"instanceId"`
+		InstanceTitle     string `json:"instanceTitle"`
+		DonatedByUid      int    `json:"donatedByUid"`
+		DonatedByUsername string `json:"donatedByUsername"`
+	} `json:"instance"`
+	Design struct {
+		Id          int    `json:"id"`
+		Title       string `json:"title"`
+		ModelSource int    `json:"modelSource"`
+	} `json:"design"`
 }
 
-func (h Hit) DesignId() int {
-	tmp := h.ExtInfoBoostExchangePoint.DesignId
+func (h Hit) DesignID() int {
+	tmp := h.ExtInfoBoostExchangePoint.DesignID
 	if tmp != 0 {
 		return tmp
 	}
 
-	tmp = h.InstanceReward.DesignId
+	tmp = h.InstanceReward.DesignID
 	if tmp != 0 {
 		return tmp
 	}
 
-	return h.DesignReward.Id
+	tmp = h.Instance.DesignId
+	if tmp != 0 {
+		return tmp
+	}
+
+	tmp = h.DesignReward.ID
+	if tmp != 0 {
+		return tmp
+	}
+
+	return h.Design.Id
 }
 
 func (h Hit) DesignName() string {
@@ -77,7 +102,22 @@ func (h Hit) DesignName() string {
 		return tmp
 	}
 
-	return h.DesignReward.Title
+	tmp = h.Instance.DesignTitle
+	if tmp != "" {
+		return tmp
+	}
+
+	tmp = h.DesignReward.Title
+	if tmp != "" {
+		return tmp
+	}
+
+	tmp = h.Design.Title
+	if tmp != "" {
+		return tmp
+	}
+
+	return "[Unknown source]"
 }
 
 type HitsList []Hit

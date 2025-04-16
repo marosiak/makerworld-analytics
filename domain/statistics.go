@@ -15,23 +15,25 @@ type PointAssignment struct {
 
 type PointsAssignmentList []PointAssignment
 
-func (p PointsAssignmentList) SortByDate(ascending bool) PointsAssignmentList {
+func (s PointsAssignmentList) SortByDate(ascending bool) PointsAssignmentList {
 	if ascending {
-		sort.Slice(p, func(i, j int) bool {
-			return p[i].CreateTime.Before(p[j].CreateTime)
+		sort.Slice(s, func(i, j int) bool {
+			return s[i].CreateTime.Before(s[j].CreateTime)
 		})
 	} else {
-		sort.Slice(p, func(i, j int) bool {
-			return p[i].CreateTime.After(p[j].CreateTime)
+		sort.Slice(s, func(i, j int) bool {
+			return s[i].CreateTime.After(s[j].CreateTime)
 		})
 	}
-	return p
+	return s
 }
 
 type Period string
 
 const (
-	PeriodDay Period = "day"
+	PeriodNone  Period = "none"
+	PeriodWeek  Period = "week"
+	PeriodMonth Period = "month"
 )
 
 func (s PointsAssignmentList) AveragePointsPerDay() float32 {
@@ -81,17 +83,17 @@ func (s PointsAssignmentList) AveragePointsPerDay() float32 {
 	return averageChange
 }
 
-func (p PointsAssignmentList) SumPointsChange() float32 {
+func (s PointsAssignmentList) SumPointsChange() float32 {
 	var total float32
-	for _, points := range p {
+	for _, points := range s {
 		total += points.PointChange
 	}
 	return total
 }
 
-func (p PointsAssignmentList) FilterDate(start, end *time.Time) PointsAssignmentList {
+func (s PointsAssignmentList) FilterDate(start, end *time.Time) PointsAssignmentList {
 	filtered := make(PointsAssignmentList, 0)
-	for _, points := range p {
+	for _, points := range s {
 		if start != nil && points.CreateTime.Before(*start) {
 			continue
 		}
@@ -213,11 +215,11 @@ func (s Statistics) ToEuro(multiplier MoneyMultiplier, pointsAmount float32) flo
 	return pointsAmount * float32(multiplier)
 }
 
-func NewStatistics(sourceJson string) *Statistics {
+func NewStatistics(sourceJSON string) *Statistics {
 	rawStatsData := makerworld.PointsStatistics{}
-	err := json.Unmarshal([]byte(sourceJson), &rawStatsData)
+	err := json.Unmarshal([]byte(sourceJSON), &rawStatsData)
 	if err != nil {
-		log.Printf("Error unmarshalling JSON: %s\n", err)
+		log.Printf("unmarshalling JSON: %s\n", err)
 		return nil
 	}
 
@@ -238,20 +240,20 @@ func NewStatistics(sourceJson string) *Statistics {
 				CreateTime:  hit.CreateTime,
 			}
 
-			designId := DesignID(hit.DesignId())
+			designID := DesignID(hit.DesignID())
 
-			_, exists := pointsPerDesignMap[designId]
+			_, exists := pointsPerDesignMap[designID]
 			if exists {
-				pointsPerDesignMap[designId] = append(pointsPerDesignMap[designId], pointsAssignment)
+				pointsPerDesignMap[designID] = append(pointsPerDesignMap[designID], pointsAssignment)
 			} else {
-				pointsPerDesignMap[designId] = PointsAssignmentList{
+				pointsPerDesignMap[designID] = PointsAssignmentList{
 					pointsAssignment,
 				}
 			}
 
-			if !allPublishedDesigns.Exists(designId) {
+			if !allPublishedDesigns.Exists(designID) {
 				allPublishedDesigns = append(allPublishedDesigns, PublishedDesign{
-					ID:   designId,
+					ID:   designID,
 					Name: hit.DesignName(),
 				})
 			}

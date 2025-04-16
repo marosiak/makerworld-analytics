@@ -2,17 +2,17 @@ package chart
 
 import (
 	"makerworld-analytics/domain"
-	"makerworld-analytics/echarts_wasm"
+	"makerworld-analytics/echarts"
 	"sort"
 	"time"
 )
 
-func (h *ChartsGridComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
-	chartData := echarts_wasm.NumericData{
+func (h *ChartsGridComponent) euroPerDayChartOption() echarts.ChartOption {
+	chartData := echarts.NumericData{
 		Values: []float32{},
 	}
 
-	xAxis := []echarts_wasm.XAxisOption{
+	xAxis := []echarts.XAxisOption{
 		{Data: []string{}},
 	}
 
@@ -52,34 +52,34 @@ func (h *ChartsGridComponent) euroPerDayChartOption() echarts_wasm.ChartOption {
 	if len(chartData.Values) > 7 {
 		chartType = "bar"
 	}
-	series := []echarts_wasm.SeriesOption{
+	series := []echarts.SeriesOption{
 		{
 			Name: "Euro income",
 			Type: chartType,
 			Data: chartData,
 		},
 	}
-	return echarts_wasm.ChartOption{
+	return echarts.ChartOption{
 		Color: []string{"#5470c6", "#91cc75"},
-		Legend: echarts_wasm.LegendOption{
+		Legend: echarts.LegendOption{
 			Data:  []string{"Series 1"},
 			Other: map[string]interface{}{},
 		},
 		Series: series,
-		Title: echarts_wasm.TitleOption{
+		Title: echarts.TitleOption{
 			More: map[string]interface{}{},
 		},
-		Toolbox: echarts_wasm.ToolboxOption{
+		Toolbox: echarts.ToolboxOption{
 			Show: true,
 		},
-		Tooltip: echarts_wasm.TooltipOption{
+		Tooltip: echarts.TooltipOption{
 			Show: true,
 		},
 		XAxis: xAxis,
-		YAxis: []echarts_wasm.YAxisOption{
+		YAxis: []echarts.YAxisOption{
 			{Some: map[string]interface{}{}},
 		},
-		DataZoom: []echarts_wasm.DataZoom{
+		DataZoom: []echarts.DataZoom{
 			{
 				Type:  "inside",
 				Start: 0,
