@@ -55,17 +55,29 @@ func (h *MainView) Render() app.UI {
 			OnKeyDown(h.onJsonChange).
 			OnPaste(h.onJsonChange).
 			OnChange(h.onJsonChange).OnInput(h.onJsonChange),
-		app.Button().Text("Import Maciej Rosiak data").Class("btn btn-soft btn-primary").OnClick(h.importMockedData),
+		app.Button().Text("Import test data").Class("btn btn-soft btn-primary").OnClick(h.importMockedData),
+		app.P().Text("Basically my data, it may be old because I am not updating it often.").Class("text-xs opacity-40 mt-1"),
 
 		app.If(h.Statistics != nil, func() app.UI {
-			filteredByDate := h.Statistics.PointsPerDate.FilterByDate(h.Settings.StartDate, h.Settings.EndDate)
+			allModels := h.Statistics.PointsPerDate.FilterByDate(h.Settings.StartDate, h.Settings.EndDate)
 
-			incomeForPeriod := domain.Statistics{}.ToEuro(h.Settings.MoneyMultiplier, filteredByDate.SumPointsChange())
-
+			var incomeForPeriod float32
 			var averageDaily float32
-			if len(filteredByDate) >= 15 {
-				averageDaily = domain.Statistics{}.ToEuro(h.Settings.MoneyMultiplier, filteredByDate.AveragePointsChange())
+			if h.Settings.PublicationFilter == nil {
+				println("no filter")
+				incomeForPeriod = allModels.SumPointsChange()
+				if len(allModels) >= 15 {
+					averageDaily = allModels.AveragePointsPerDay()
+				}
+			} else {
+				println("filter by design")
+				pointsPerDesignFilteredByDate := h.Statistics.PointsPerDesign[h.Settings.PublicationFilter.ID].FilterDate(h.Settings.StartDate, h.Settings.EndDate)
+				incomeForPeriod = pointsPerDesignFilteredByDate.SumPointsChange()
+				averageDaily = pointsPerDesignFilteredByDate.AveragePointsPerDay()
 			}
+
+			incomeForPeriod = h.Statistics.ToEuro(h.Settings.MoneyMultiplier, incomeForPeriod)
+			averageDaily = h.Statistics.ToEuro(h.Settings.MoneyMultiplier, averageDaily)
 
 			return app.Div().Class("mt-8 flex flex-col").Body(
 				&SettingsComponent{
@@ -102,7 +114,7 @@ func (h *MainView) Render() app.UI {
 						}
 					}),
 				),
-				&ChartsGridComponent{Statistics: h.Statistics, StartDate: h.Settings.StartDate, EndDate: h.Settings.EndDate, MoneyMultiplier: h.Settings.MoneyMultiplier, MinimumPointsThresholdForPieChart: 15},
+				&ChartsGridComponent{Statistics: h.Statistics, StartDate: h.Settings.StartDate, EndDate: h.Settings.EndDate, MoneyMultiplier: h.Settings.MoneyMultiplier, MinimumPointsThresholdForPieChart: 15, MinimumPointsThresholdForStackedChart: 0.1, SelectedDesign: h.Settings.PublicationFilter},
 			)
 		}))
 }

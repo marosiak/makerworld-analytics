@@ -6,9 +6,10 @@ import (
 )
 
 type Settings struct {
-	StartDate       *time.Time
-	EndDate         *time.Time
-	MoneyMultiplier MoneyMultiplier
+	StartDate         *time.Time
+	EndDate           *time.Time
+	MoneyMultiplier   MoneyMultiplier
+	PublicationFilter *PublishedDesign
 }
 
 func (s Settings) String() string {

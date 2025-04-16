@@ -6,12 +6,13 @@ import (
 
 type EChartComp struct {
 	app.Compo
-	ContainerID string
-	Option      ChartOption
+	ContainerID   string
+	Option        ChartOption
+	WidthCssValue string
 }
 
 func (c *EChartComp) Render() app.UI {
-	return app.Div().ID(c.ContainerID).Style("height", "600px").Style("width", "37vw")
+	return app.Div().ID(c.ContainerID).Style("height", "600px").Style("width", c.WidthCssValue)
 }
 
 func (c *EChartComp) OnMount(ctx app.Context) {
@@ -32,5 +33,6 @@ func (c *EChartComp) OnUpdate(ctx app.Context) {
 			map[string]any{"renderer": "canvas"},
 		)
 
-	chart.Call("setOption", c.Option.ToMap())
+	optionsMapped := c.Option.ToMap()
+	chart.Call("setOption", optionsMapped)
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"makerworld-analytics/makerworld"
+	"sort"
 	"time"
 )
 
@@ -13,6 +14,72 @@ type PointAssignment struct {
 }
 
 type PointsAssignmentList []PointAssignment
+
+func (p PointsAssignmentList) SortByDate(ascending bool) PointsAssignmentList {
+	if ascending {
+		sort.Slice(p, func(i, j int) bool {
+			return p[i].CreateTime.Before(p[j].CreateTime)
+		})
+	} else {
+		sort.Slice(p, func(i, j int) bool {
+			return p[i].CreateTime.After(p[j].CreateTime)
+		})
+	}
+	return p
+}
+
+type Period string
+
+const (
+	PeriodDay Period = "day"
+)
+
+func (s PointsAssignmentList) AveragePointsPerDay() float32 {
+	if len(s) == 0 {
+		return 0
+	}
+
+	normalized := map[time.Time]float32{}
+	firstDay := time.Time{}
+	lastDay := time.Time{}
+
+	for _, v := range s {
+		d := v.CreateTime.Format("2006-01-02")
+		dateOnly, _ := time.Parse("2006-01-02", d)
+
+		normalized[dateOnly] += v.PointChange
+
+		if firstDay.IsZero() || dateOnly.Before(firstDay) {
+			firstDay = dateOnly
+		}
+		if lastDay.IsZero() || dateOnly.After(lastDay) {
+			lastDay = dateOnly
+		}
+	}
+
+	days := int(lastDay.Sub(firstDay).Hours()/24) + 1
+	if days <= 1 {
+		return 0
+	}
+
+	pointsPerDay := make([]float32, days)
+	for i := 0; i < days; i++ {
+		day := firstDay.AddDate(0, 0, i)
+		pointsPerDay[i] = normalized[day]
+	}
+
+	totalChange := float32(0)
+	for i := 1; i < days; i++ {
+		change := pointsPerDay[i] - pointsPerDay[i-1]
+		if change < 0 {
+			change = -change
+		}
+		totalChange += change
+	}
+
+	averageChange := totalChange / float32(days-1)
+	return averageChange
+}
 
 func (p PointsAssignmentList) SumPointsChange() float32 {
 	var total float32
@@ -39,6 +106,7 @@ func (p PointsAssignmentList) FilterDate(start, end *time.Time) PointsAssignment
 }
 
 type PointsPerDesign map[DesignID]PointsAssignmentList
+
 type Statistics struct {
 	TotalPoints      float32 `json:"totalPoints"`
 	PointsFromBoosts float32 `json:"pointsFromBoosts"`
@@ -71,7 +139,7 @@ func (s PointsPerDateMap) SumPointsChange() float32 {
 	return total
 }
 
-func (s PointsPerDateMap) AveragePointsChange() float32 {
+func (s PointsPerDateMap) AveragePointsPerDay() float32 {
 	if len(s) == 0 {
 		return 0
 	}

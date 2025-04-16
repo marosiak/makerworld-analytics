@@ -73,6 +73,16 @@ type LegendOption struct {
 type ItemStyle struct {
 	BorderRadius int
 }
+type StackType string
+
+const (
+	StackTypeTotal StackType = "Total"
+)
+
+type Emphasis struct {
+	Focus string
+}
+
 type SeriesOption struct {
 	Name      string
 	Type      string
@@ -81,6 +91,9 @@ type SeriesOption struct {
 	Radius    []string
 	PadAngle  int
 	ItemStyle ItemStyle
+	Stack     StackType
+	Emphasis  *Emphasis
+	AreaStyle map[string]interface{}
 }
 
 type TitleOption struct {
@@ -98,7 +111,8 @@ type TooltipOption struct {
 }
 
 type XAxisOption struct {
-	Data []string
+	Data  []string
+	Other map[string]interface{}
 }
 
 type YAxisOption struct {
@@ -133,30 +147,44 @@ func (o ChartOption) ToMap() map[string]interface{} {
 	}
 	var seriesArr []interface{}
 	for _, s := range o.Series {
-		sm := map[string]interface{}{
+		series := map[string]interface{}{
 			"name": s.Name,
 			"type": s.Type,
 		}
 		if s.Data != nil {
-			sm["data"] = s.Data.ToJS()
+			series["data"] = s.Data.ToJS()
 		} else {
-			sm["data"] = []interface{}{}
+			series["data"] = []interface{}{}
 		}
 		if s.Label != nil {
-			sm["label"] = s.Label
+			series["label"] = s.Label
 		}
 		if len(s.Radius) > 0 {
-			sm["radius"] = sliceOfStringToInterface(s.Radius)
+			series["radius"] = sliceOfStringToInterface(s.Radius)
 		}
 		if s.PadAngle != 0 {
-			sm["padAngle"] = s.PadAngle
+			series["padAngle"] = s.PadAngle
+		}
+		if s.Stack != "" {
+			series["stack"] = string(s.Stack)
+		}
+		if s.Emphasis != nil {
+			series["emphasis"] = map[string]interface{}{}
+			if s.Emphasis.Focus != "" {
+				series["emphasis"] = map[string]interface{}{
+					"focus": s.Emphasis.Focus,
+				}
+			}
+		}
+		if s.AreaStyle != nil {
+			series["areaStyle"] = s.AreaStyle
 		}
 		if s.ItemStyle.BorderRadius != 0 {
-			sm["itemStyle"] = map[string]interface{}{
+			series["itemStyle"] = map[string]interface{}{
 				"borderRadius": s.ItemStyle.BorderRadius,
 			}
 		}
-		seriesArr = append(seriesArr, sm)
+		seriesArr = append(seriesArr, series)
 	}
 	if len(seriesArr) > 0 {
 		m["series"] = seriesArr
@@ -200,6 +228,11 @@ func (o ChartOption) ToMap() map[string]interface{} {
 		xmap := map[string]interface{}{}
 		if len(xa.Data) > 0 {
 			xmap["data"] = sliceOfStringToInterface(xa.Data)
+		}
+		if xa.Other != nil {
+			for k, v := range xa.Other {
+				xmap[k] = v
+			}
 		}
 		xAxisArr = append(xAxisArr, xmap)
 	}
