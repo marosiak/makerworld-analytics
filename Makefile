@@ -4,9 +4,17 @@ build:
 
 
 build_optimized_wasm:
-	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o web/app_optimized.wasm ./cmd/server
+	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o web/app.wasm ./cmd/server
 
+	wasm-opt ./web/app.wasm \
+		--enable-bulk-memory \
+		-Oz \
+		--vacuum \
+		--remove-unused-module-elements \
+		--dce \
+		--output=./web/app.final.wasm
 
+	
 
 build_static:
 	cd docs && go run .././cmd/static/

@@ -8,4 +8,7 @@ require (
 	golang.org/x/net v0.35.0
 )
 
-require github.com/google/uuid v1.6.0 // indirect
+require (
+	github.com/gonowa/wasm-opt v0.0.0-20180903140629-634871023a27 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+)
