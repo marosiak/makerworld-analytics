@@ -53,7 +53,7 @@ func (s *SelectComponent[T]) Render() app.UI {
 			isSelected := s.isCurrentlySelected(value)
 			return app.Option().
 				Text(s.OptionDataList[i].Label).
-				Value(value).Selected(isSelected).Disabled(isSelected)
+				Value(value).Selected(isSelected)
 		}),
 	).OnChange(s.onChange())
 }
