@@ -5,6 +5,7 @@ import (
 	"makerworld-analytics/domain"
 	"makerworld-analytics/makerworld"
 	. "makerworld-analytics/ui/components"
+	. "makerworld-analytics/ui/components/chart"
 )
 
 type MainView struct {

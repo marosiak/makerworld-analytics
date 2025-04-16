@@ -36,7 +36,7 @@ func (c *TimeRangeComponent) inputChanged(ctx app.Context, e app.Event) {
 
 func (c *TimeRangeComponent) Render() app.UI {
 	return app.Div().Class("w-full max-w-xs").Body(
-		app.Input().Type("range").OnChange(c.inputChanged).OnInput(c.inputChanged).Min(0).Max(4).Value(4).Class("range range-primary").Step(1),
+		app.Input().Type("range").OnChange(c.inputChanged).OnInput(c.inputChanged).Min(0).Max(4).Value(4).Class("range range-primary select-none").Step(1),
 		app.Div().Class("flex justify-between px-2.5 mt-2 text-xs select-none").Body(
 			app.Span().Text("|"),
 			app.Span().Text("|"),

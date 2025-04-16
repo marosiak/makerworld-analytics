@@ -34,5 +34,6 @@ func (c *EChartComp) OnUpdate(ctx app.Context) {
 		)
 
 	optionsMapped := c.Option.ToMap()
+	app.Window().Get("console").Call("log", optionsMapped)
 	chart.Call("setOption", optionsMapped)
 }

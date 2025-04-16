@@ -54,15 +54,21 @@ func (s StringData) ToJS() interface{} {
 	return arr
 }
 
+type DataZoom struct {
+	Type  string
+	Start int
+	End   int
+}
 type ChartOption struct {
-	Color   []string
-	Legend  LegendOption
-	Series  []SeriesOption
-	Title   TitleOption
-	Toolbox ToolboxOption
-	Tooltip TooltipOption
-	XAxis   []XAxisOption
-	YAxis   []YAxisOption
+	Color    []string
+	Legend   LegendOption
+	Series   []SeriesOption
+	Title    TitleOption
+	Toolbox  ToolboxOption
+	Tooltip  TooltipOption
+	XAxis    []XAxisOption
+	YAxis    []YAxisOption
+	DataZoom []DataZoom
 }
 
 type LegendOption struct {
@@ -211,17 +217,17 @@ func (o ChartOption) ToMap() map[string]interface{} {
 		delete(m, "toolbox")
 	}
 
-	m["tooltip"] = map[string]interface{}{}
+	tooltip := make(map[string]interface{})
 	if o.Tooltip.Show {
-		m["tooltip"] = map[string]interface{}{
-			"show": true,
-		}
+		tooltip["show"] = true
 	}
+
 	if o.Tooltip.Other != nil {
 		for k, v := range o.Tooltip.Other {
-			leg[k] = v
+			tooltip[k] = v
 		}
 	}
+	m["tooltip"] = tooltip
 
 	var xAxisArr []interface{}
 	for _, xa := range o.XAxis {
@@ -250,6 +256,19 @@ func (o ChartOption) ToMap() map[string]interface{} {
 			}
 		}
 		yAxisArr = append(yAxisArr, ymap)
+	}
+
+	if len(o.DataZoom) > 0 {
+		dataZoomArr := make([]interface{}, 0, len(o.DataZoom))
+		for _, dz := range o.DataZoom {
+			dzMap := map[string]interface{}{
+				"type":  dz.Type,
+				"start": dz.Start,
+				"end":   dz.End,
+			}
+			dataZoomArr = append(dataZoomArr, dzMap)
+		}
+		m["dataZoom"] = dataZoomArr
 	}
 	if len(yAxisArr) > 0 {
 		m["yAxis"] = yAxisArr

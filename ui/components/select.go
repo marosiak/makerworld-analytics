@@ -77,7 +77,6 @@ func (s *SelectComponent[T]) onChange() func(ctx app.Context, e app.Event) {
 			output = nil
 		}
 
-		fmt.Printf("emitting: %v", output)
 		s.OnChange(ctx, output)
 	}
 }
