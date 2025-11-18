@@ -1,6 +1,8 @@
 package makerworld
 
 import (
+	"encoding/json"
+	"fmt"
 	"sort"
 	"time"
 )
@@ -11,6 +13,7 @@ const (
 	RevenueSourceBoost          = "boost_exchange_point"
 	RevenueSourceInstanceReward = "instance_reward"
 	RevenueSourceDesignReward   = "design_reward"
+	DesignRewardV2              = "design_reward_v2"
 	RevenueSourceCreateInstance = "create_instance"
 )
 
@@ -52,6 +55,16 @@ type Hit struct {
 		DonatedByUsername     string `json:"donatedByUsername"`
 	} `json:"instanceReward,omitempty"`
 
+	InstanceRewardV2 struct {
+		DesignId          int    `json:"designId"`
+		DesignTitle       string `json:"designTitle"`
+		InstanceId        int    `json:"instanceId"`
+		InstanceTitle     string `json:"instanceTitle"`
+		EarningTime       string `json:"earningTime"`
+		DonatedByUid      int    `json:"donatedByUid"`
+		DonatedByUsername string `json:"donatedByUsername"`
+	} `json:"instanceRewardV2"`
+
 	Instance struct {
 		DesignId          int    `json:"designId"`
 		DesignTitle       string `json:"designTitle"`
@@ -68,6 +81,9 @@ type Hit struct {
 }
 
 func (h Hit) DesignID() int {
+	if h.InstanceRewardV2.InstanceId != 0 {
+		return h.InstanceRewardV2.DesignId
+	}
 	tmp := h.ExtInfoBoostExchangePoint.DesignID
 	if tmp != 0 {
 		return tmp
@@ -92,6 +108,9 @@ func (h Hit) DesignID() int {
 }
 
 func (h Hit) DesignName() string {
+	if h.InstanceRewardV2.InstanceId != 0 {
+		return h.InstanceRewardV2.DesignTitle
+	}
 	tmp := h.ExtInfoBoostExchangePoint.DesignTitle
 	if tmp != "" {
 		return tmp
@@ -117,7 +136,18 @@ func (h Hit) DesignName() string {
 		return tmp
 	}
 
-	return "[Unknown source]"
+	if h.Type == DesignRewardV2 {
+		return "Design reward V2"
+	}
+
+	by, err := json.Marshal(h)
+	if err != nil {
+		return ""
+	}
+
+	fmt.Println(string(by))
+
+	return "Unknown source"
 }
 
 type HitsList []Hit
